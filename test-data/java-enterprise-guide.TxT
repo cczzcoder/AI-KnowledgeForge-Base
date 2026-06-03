@@ -1,0 +1,77 @@
+Java 企业级开发技术栈详解
+============================
+
+一、Java 语言概述
+
+Java 是一种广泛使用的面向对象编程语言，由 James Gosling 于 1995 年在 Sun Microsystems 创建。
+Java 的设计理念是"一次编写，到处运行"（Write Once, Run Anywhere），这得益于 Java 虚拟机（JVM）技术。
+
+Java 的主要特点：
+- 面向对象：支持封装、继承和多态三大特性
+- 平台无关性：编译为字节码，可在任何 JVM 上运行
+- 自动内存管理：垃圾回收机制（GC）自动回收不再使用的内存
+- 强类型语言：编译时类型检查，减少运行时错误
+- 丰富的类库：提供大量标准 API，涵盖网络、IO、并发等
+
+二、Spring Boot 框架
+
+Spring Boot 是构建 Java 企业级应用的事实标准框架。它通过自动配置和起步依赖，大幅简化了 Spring 应用的开发。
+
+核心特性：
+1. 自动配置：根据类路径中的依赖自动配置 Spring 应用
+2. 起步依赖：一站式引入所需依赖，解决版本冲突问题
+3. 内嵌服务器：内置 Tomcat、Jetty 或 Undertow，无需外部部署
+4. Actuator：提供生产就绪的监控和管理端点
+
+常用注解：
+- @SpringBootApplication：主应用类注解，组合了 @Configuration、@EnableAutoConfiguration 和 @ComponentScan
+- @RestController：REST 控制器，组合了 @Controller 和 @ResponseBody
+- @Service：标注业务逻辑层组件
+- @Repository：标注数据访问层组件
+- @Autowired：自动注入依赖
+
+三、MyBatis-Plus 持久层框架
+
+MyBatis-Plus 是 MyBatis 的增强工具，在 MyBatis 的基础上只做增强不做改变，简化开发、提高效率。
+
+核心功能：
+- 通用 CRUD：内置 BaseMapper，提供基本的增删改查方法
+- 条件构造器：LambdaQueryWrapper 和 QueryWrapper 灵活构建查询条件
+- 分页插件：物理分页支持，自动处理分页查询
+- 代码生成器：根据数据库表自动生成实体类、Mapper、Service 等代码
+
+四、RESTful API 设计规范
+
+REST（Representational State Transfer）是一种软件架构风格，用于设计网络应用接口。
+
+设计原则：
+- 使用 HTTP 方法表达操作：GET（查询）、POST（创建）、PUT（更新）、DELETE（删除）
+- URL 使用名词复数形式：/api/v1/users、/api/v1/orders
+- 使用 HTTP 状态码表示结果：200（成功）、201（已创建）、400（请求错误）、404（未找到）、500（服务器错误）
+- 统一响应格式：{ "code": 200, "message": "success", "data": {} }
+
+五、数据库设计最佳实践
+
+1. 命名规范
+   - 表名使用小写字母和下划线：user_info、order_detail
+   - 字段名使用小写字母和下划线：created_at、updated_at
+   - 主键统一使用 UUID 或自增 ID
+
+2. 索引设计
+   - 为经常查询的字段创建索引
+   - 避免过多索引影响写入性能
+   - 使用 EXPLAIN 分析查询执行计划
+
+3. 数据类型选择
+   - 时间类型：使用 TIMESTAMP 或 DATETIME
+   - 金额类型：使用 DECIMAL 而非 FLOAT
+   - 文本类型：短文本用 VARCHAR，长文本用 TEXT
+
+六、系统设计要点
+
+- 高可用：通过多实例部署、负载均衡实现
+- 高性能：使用缓存（Redis）、异步处理（消息队列）、数据库优化
+- 高扩展：微服务架构、水平分库分表
+- 安全性：输入校验、SQL 注入防护、XSS 防护、CSRF 防护
+
+本文档适用于 Java 开发工程师的日常开发参考，涵盖了从基础语法到企业级架构的核心知识点。

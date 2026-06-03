@@ -1,0 +1,136 @@
+/* ============================================
+   ServiceUnavailableBanner 样式
+   包含：入场动画、脉冲图标、响应式、暗色模式
+   ============================================ */
+
+/* 外层容器 — 控制入场/离场动画 */
+.service-unavailable-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+}
+
+.service-unavailable-wrapper.visible {
+  max-height: 300px;
+  opacity: 1;
+}
+
+/* 横幅本体 */
+.service-unavailable-alert {
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+}
+
+/* 图标脉冲动画 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse-icon {
+  animation: pulse 2s ease-in-out infinite;
+  font-size: 16px;
+  color: #ff4d4f;
+}
+
+/* 标题 */
+.banner-title {
+  font-size: 14px;
+}
+
+/* 持续时长 */
+.banner-downtime {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 描述区域 */
+.banner-description {
+  margin-top: 2px;
+}
+
+/* 故障排查列表 */
+.troubleshooting {
+  margin-top: 4px;
+}
+
+.troubleshooting ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  line-height: 1.8;
+}
+
+.troubleshooting li {
+  list-style: disc;
+}
+
+/* 联系支持 */
+.contact-support {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+/* 重试按钮 */
+.retry-button {
+  font-size: 12px;
+}
+
+/* ============================================
+   响应式 — 移动端适配
+   ============================================ */
+@media (max-width: 576px) {
+  .banner-title {
+    font-size: 13px;
+  }
+
+  .banner-downtime {
+    font-size: 11px;
+  }
+
+  .troubleshooting ul {
+    font-size: 11px;
+    padding-left: 14px;
+  }
+
+  .contact-support {
+    font-size: 11px;
+  }
+
+  .retry-button {
+    font-size: 11px;
+    padding: 0 8px;
+    height: 26px;
+  }
+
+  .service-unavailable-wrapper.visible {
+    max-height: 400px;
+  }
+}
+
+/* ============================================
+   暗色模式
+   ============================================ */
+html[data-theme='dark'] .service-unavailable-alert {
+  background: #1f1f2e !important;
+  border-color: #3a1f1f !important;
+  border-bottom-color: #4a2020 !important;
+}
+
+html[data-theme='dark'] .troubleshooting ul {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+html[data-theme='dark'] .troubleshooting li::marker {
+  color: #ff7875;
+}
+
+html[data-theme='dark'] .contact-support .ant-typography code {
+  background: rgba(255, 77, 79, 0.15);
+  border-color: rgba(255, 77, 79, 0.3);
+  color: #ff7875;
+}

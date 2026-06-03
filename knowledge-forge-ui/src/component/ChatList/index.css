@@ -1,0 +1,19 @@
+.chat-list {
+  padding: 4px 0;
+}
+
+.chat-list-item {
+  padding: 8px 16px !important;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 6px;
+  margin: 2px 8px;
+}
+
+.chat-list-item:hover {
+  background: #f0f0f0;
+}
+
+.chat-list-item.active {
+  background: #e6f4ff;
+}

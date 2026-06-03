@@ -1,0 +1,71 @@
+{
+  "title": "Spring Boot 微服务架构指南",
+  "version": "1.0.0",
+  "author": "KnowledgeForge Team",
+  "created": "2026-05-31",
+  "topics": [
+    {
+      "id": 1,
+      "name": "Spring Boot 基础",
+      "description": "Spring Boot 是由 Pivotal 团队提供的全新框架，其设计目的是简化 Spring 应用的初始搭建和开发过程。它采用约定优于配置的理念，通过自动配置减少开发者的配置工作。",
+      "keyPoints": [
+        "自动配置：根据依赖自动配置 Spring 应用",
+        "起步依赖：一站式引入所需依赖，无需版本冲突",
+        "内嵌服务器：内置 Tomcat、Jetty 或 Undertow",
+        "Actuator 监控：提供生产级的应用监控和管理端点"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "微服务架构设计",
+      "description": "微服务架构是一种将单体应用拆分为多个小型独立服务的架构风格，每个服务围绕特定业务能力构建，可以独立开发、部署和扩展。",
+      "keyPoints": [
+        "服务拆分：按业务领域合理拆分微服务",
+        "服务通信：REST API、gRPC、消息队列",
+        "服务发现：Eureka、Consul、Nacos",
+        "配置管理：Spring Cloud Config、Nacos Config",
+        "链路追踪：Sleuth + Zipkin、SkyWalking"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "数据库与持久化",
+      "description": "Spring Data JPA 是 Spring 生态中用于数据访问的框架，通过 Repository 接口简化数据库操作，支持多种数据库和查询方式。",
+      "keyPoints": [
+        "JPA Repository：通过方法命名约定自动生成查询",
+        "事务管理：@Transactional 声明式事务",
+        "Flyway 迁移：数据库版本管理工具",
+        "连接池：HikariCP 高性能数据库连接池"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "安全与认证",
+      "description": "Spring Security 是 Spring 生态中用于认证和授权的安全框架，提供声明式安全控制和多种认证方式。",
+      "keyPoints": [
+        "JWT 认证：无状态的 Token 认证机制",
+        "OAuth2：第三方授权登录",
+        "RBAC：基于角色的访问控制",
+        "CSRF 防护：跨站请求伪造保护"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "容器化部署",
+      "description": "Docker 容器化技术可以将应用及其依赖打包为一个可移植的镜像，确保应用在任何环境中都能一致运行。",
+      "keyPoints": [
+        "Dockerfile：编写镜像构建脚本",
+        "Docker Compose：多容器应用编排",
+        "Kubernetes：容器编排平台",
+        "CI/CD：持续集成与持续部署"
+      ]
+    }
+  ],
+  "bestPractices": [
+    "使用分层架构：Controller → Service → Repository",
+    "统一异常处理：@RestControllerAdvice 全局异常处理",
+    "API 版本管理：通过 URL 路径或请求头管理版本",
+    "日志规范：使用 SLF4J + Logback，合理设置日志级别",
+    "接口文档：使用 Swagger/OpenAPI 生成 API 文档"
+  ]
+}

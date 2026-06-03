@@ -1,0 +1,84 @@
+.discovery-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+.discovery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.discovery-back-btn {
+  font-size: 18px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.discovery-back-btn:hover {
+  color: #1677ff;
+}
+
+.discovery-reload-btn {
+  font-size: 18px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.discovery-reload-btn:hover {
+  color: #1677ff;
+}
+
+.discovery-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.discovery-tab {
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.discovery-tab:hover {
+  color: #1677ff;
+}
+
+.discovery-tab.active {
+  color: #1677ff;
+  border-bottom-color: #1677ff;
+  font-weight: 500;
+}
+
+.discovery-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.gaps-section,
+.recommendations-section,
+.learning-section {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ant-list-item {
+  padding: 8px 0 !important;
+  border-bottom: none !important;
+}

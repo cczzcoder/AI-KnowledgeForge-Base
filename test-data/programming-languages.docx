@@ -1,0 +1,7 @@
+name,type,first_released,creator,paradigm,description
+Java,编译型,1995,James Gosling,面向对象,"Java是一种广泛使用的编程语言，由Sun Microsystems开发。它以'一次编写，到处运行'的理念著称，运行在JVM上，广泛用于企业级应用、Android开发和大数据处理。"
+Python,解释型,1991,Guido van Rossum,多范式,"Python是一种高级编程语言，以简洁易读的语法闻名。它支持面向对象、函数式和过程式编程，广泛用于数据科学、人工智能、Web开发和自动化脚本。"
+Go,编译型,2009,Google,并发编程,"Go（又称Golang）是由Google开发的一种静态类型编译语言。它专注于简洁性、并发性和高效性，内置goroutine和channel，广泛用于云原生、微服务和网络编程。"
+Rust,编译型,2010,Mozilla Research,系统编程,"Rust是一种注重安全性、并发性和性能的系统编程语言。它通过所有权系统和借用检查器在编译时防止内存错误，无需垃圾回收器，适合高性能系统开发。"
+TypeScript,转译型,2012,Microsoft,多范式,"TypeScript是JavaScript的超集，添加了静态类型检查。它编译为纯JavaScript，支持面向对象和函数式编程，广泛用于大型前端项目和企业级Web应用。"
+Kotlin,编译型,2011,JetBrains,面向对象,"Kotlin是一种现代编程语言，运行在JVM上，与Java完全互操作。它被Google宣布为Android官方首选开发语言，语法简洁且支持空安全。"

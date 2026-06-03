@@ -1,0 +1,1 @@
+﻿Java是一种广泛使用的编程语言，由Sun Microsystems公司于1995年推出。Java的设计目标是Write Once, Run Anywhere。Spring Boot是一个用于简化Spring应用开发的框架，它提供了自动配置、起步依赖和内嵌服务器等功能。Spring Boot使得开发者可以快速搭建生产级别的Spring应用。

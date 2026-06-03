@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 128 128" id="robot">
+  <path fill="#1677ff" d="M 64 12 C 38.8 12 18 30.8 18 53.5 C 18 73.5 34.5 90 53.5 93.5 L 53.5 108 C 53.5 110.2 55.3 112 57.5 112 L 70.5 112 C 72.7 112 74.5 110.2 74.5 108 L 74.5 93.5 C 93.5 90 110 73.5 110 53.5 C 110 30.8 89.2 12 64 12 Z"></path>
+  <circle cx="50" cy="48" r="8" fill="#fff"></circle>
+  <circle cx="78" cy="48" r="8" fill="#fff"></circle>
+  <path fill="#fff" d="M 48 68 Q 64 80 80 68" stroke="#fff" stroke-width="3" fill="none"></path>
+</svg>
