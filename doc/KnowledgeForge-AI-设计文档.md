@@ -1,11 +1,11 @@
 # KnowledgeForge AI 个人知识库问答系统 — 设计文档
 
-> **版本：** v1.3（已根据 Spring AI 1.0 GA 官方文档 + 2025 RAG 最佳实践审查修订）  
-> **作者：** PM Agent  
-> **日期：** 2026-05-30  
+> **版本：** v1.3（已根据 Spring AI 1.0 GA 官方文档 + 2025 RAG 最佳实践审查修订）\
+> **作者：** PM Agent\
+> **日期：** 2026-05-30\
 > **参考：** [Spring AI 1.0 官方文档](https://docs.spring.io/spring-ai/reference/) / [pgvector 文档](https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html) / [Elasticsearch + Spring AI RAG](https://www.elastic.co/search-labs/blog/spring-ai-elasticsearch-application) / RAG 技术白皮书 / know-hub-ai 项目分析
 
----
+***
 
 ## 目录
 
@@ -20,7 +20,7 @@
 9. [部署架构](#9-部署架构)
 10. [开发排期建议](#10-开发排期建议)
 
----
+***
 
 ## 1. 项目概述
 
@@ -34,15 +34,15 @@
 
 ### 1.3 核心目标
 
-| 目标 | 描述 |
-|---|---|
+| 目标   | 描述                         |
+| ---- | -------------------------- |
 | 精准问答 | 基于用户私有知识库，提供准确、有源可溯的 AI 回答 |
 | 知识关联 | 通过知识图谱自动发现知识间的实体关系，实现推理式检索 |
-| 可信溯源 | 每个回答附带来源追溯链，标明出自哪个文档的哪个段落 |
+| 可信溯源 | 每个回答附带来源追溯链，标明出自哪个文档的哪个段落  |
 | 持续进化 | 对话中产生的新知识自动沉淀入库，知识库随使用不断增长 |
-| 主动服务 | 基于用户提问行为，主动推荐知识盲区和关联知识 |
+| 主动服务 | 基于用户提问行为，主动推荐知识盲区和关联知识     |
 
----
+***
 
 ## 2. 与 know-hub-ai 的差异化创新点
 
@@ -50,16 +50,16 @@
 
 ### 2.1 创新点对比矩阵
 
-| 维度 | know-hub-ai | **KnowledgeForge AI（本方案）** |
-|---|---|---|
-| **检索策略** | 纯向量语义检索 | **多策略混合检索**（BM25 关键词 + 向量语义 + 知识图谱推理） |
-| **知识组织** | 知识库隔离（文件夹式） | **知识图谱组织**（实体-关系-实体，支持图遍历推理） |
-| **文档分块** | 依赖 Spring AI 默认分块 | **自适应语义分块**（基于标题层级 + 段落语义完整性动态分块） |
-| **可信度** | 无评分机制 | **知识可信度溯源**（来源追溯链 + 多维度可信度评分） |
-| **知识增长** | 纯手动上传 | **增量学习**（对话新知识自动沉淀，用户审核后入库） |
-| **主动服务** | 被动问答 | **主动知识发现**（基于知识图谱盲区检测，主动推荐未覆盖知识） |
-| **模型适配** | 单一 Embedding 模型 | **多模型热插拔**（支持运行时切换 Embedding / Chat 模型） |
-| **反馈闭环** | 无 | **答案质量反馈**（用户评分 → 影响后续检索权重） |
+| 维度       | know-hub-ai       | **KnowledgeForge AI（本方案）**              |
+| -------- | ----------------- | --------------------------------------- |
+| **检索策略** | 纯向量语义检索           | **多策略混合检索**（BM25 关键词 + 向量语义 + 知识图谱推理）   |
+| **知识组织** | 知识库隔离（文件夹式）       | **知识图谱组织**（实体-关系-实体，支持图遍历推理）            |
+| **文档分块** | 依赖 Spring AI 默认分块 | **自适应语义分块**（基于标题层级 + 段落语义完整性动态分块）       |
+| **可信度**  | 无评分机制             | **知识可信度溯源**（来源追溯链 + 多维度可信度评分）           |
+| **知识增长** | 纯手动上传             | **增量学习**（对话新知识自动沉淀，用户审核后入库）             |
+| **主动服务** | 被动问答              | **主动知识发现**（基于知识图谱盲区检测，主动推荐未覆盖知识）        |
+| **模型适配** | 单一 Embedding 模型   | **多模型热插拔**（支持运行时切换 Embedding / Chat 模型） |
+| **反馈闭环** | 无                 | **答案质量反馈**（用户评分 → 影响后续检索权重）             |
 
 ### 2.2 六大创新点详解
 
@@ -80,11 +80,11 @@
 
 固定大小分块（如 512 token）会破坏文档的语义完整性。本方案实现三级自适应分块：
 
-| 层级 | 策略 | 说明 |
-|---|---|---|
-| L1 文档级 | 按一级标题拆分 | 保证大章节完整性 |
-| L2 段落级 | 按二级标题 + 段落边界拆分 | 保证小节语义完整 |
-| L3 句子级 | 对过长段落做句子边界拆分 | 兜底策略，确保不超过 token 上限 |
+| 层级     | 策略             | 说明                  |
+| ------ | -------------- | ------------------- |
+| L1 文档级 | 按一级标题拆分        | 保证大章节完整性            |
+| L2 段落级 | 按二级标题 + 段落边界拆分 | 保证小节语义完整            |
+| L3 句子级 | 对过长段落做句子边界拆分   | 兜底策略，确保不超过 token 上限 |
 
 每个 chunk 携带层级元信息（`h1 → h2 → h3`），检索时可利用层级关系进行上下文扩展。
 
@@ -98,11 +98,11 @@
 
 评分维度：
 
-| 维度 | 权重 | 说明 |
-|---|---|---|
-| 来源匹配度 | 40% | 检索相似度分数 |
-| 文档新鲜度 | 20% | 基于时间的衰减因子 |
-| 来源多样性 | 20% | 信息来源是否来自多个独立文档 |
+| 维度    | 权重  | 说明               |
+| ----- | --- | ---------------- |
+| 来源匹配度 | 40% | 检索相似度分数          |
+| 文档新鲜度 | 20% | 基于时间的衰减因子        |
+| 来源多样性 | 20% | 信息来源是否来自多个独立文档   |
 | 历史验证度 | 20% | 该知识来源历史上被用户采纳的频率 |
 
 #### 创新点四：增量学习与知识沉淀
@@ -117,11 +117,11 @@
 
 结合三种检索策略，支持动态权重调整：
 
-| 策略 | 引擎 | 优势 | 权重(默认) |
-|---|---|---|---|
-| 关键词检索 | Elasticsearch BM25 | 精确匹配、专有名词 | 30% |
-| 语义检索 | pgvector/Milvus 向量检索 | 语义理解、模糊匹配 | 50% |
-| 图谱推理 | Neo4j 图遍历 | 关系推理、知识扩展 | 20% |
+| 策略    | 引擎                   | 优势        | 权重(默认) |
+| ----- | -------------------- | --------- | ------ |
+| 关键词检索 | Elasticsearch BM25   | 精确匹配、专有名词 | 30%    |
+| 语义检索  | pgvector/Milvus 向量检索 | 语义理解、模糊匹配 | 50%    |
+| 图谱推理  | Neo4j 图遍历            | 关系推理、知识扩展 | 20%    |
 
 最终得分 = BM25得分 × 0.3 + 向量得分 × 0.5 + 图谱得分 × 0.2
 
@@ -133,7 +133,7 @@
 - **主动推荐：** 「您最近关注了 X 主题，但关于 X 的 Y 方面知识库尚未覆盖，是否上传相关资料？」
 - **学习路径：** 基于已覆盖知识，推荐学习路径中缺失的前置/后续知识
 
----
+***
 
 ## 3. 系统架构设计
 
@@ -141,12 +141,12 @@
 
 > 本方案基础设施较多（6 个存储组件），建议分期引入以控制复杂度：
 
-| 阶段 | 必选组件 | 说明 |
-|---|---|---|
-| 一期（MVP） | PostgreSQL + pgvector + 本地文件系统 | 核心 RAG 问答可用 |
-| 二期 | + Redis | 分布式会话缓存 |
-| 三期（可选） | + Elasticsearch | 数据量破万级文档时引入 BM25 |
-| 三期（可选） | + Neo4j | 需要图谱推理时引入 |
+| 阶段      | 必选组件                           | 说明               |
+| ------- | ------------------------------ | ---------------- |
+| 一期（MVP） | PostgreSQL + pgvector + 本地文件系统 | 核心 RAG 问答可用      |
+| 二期      | + Redis                        | 分布式会话缓存          |
+| 三期（可选）  | + Elasticsearch                | 数据量破万级文档时引入 BM25 |
+| 三期（可选）  | + Neo4j                        | 需要图谱推理时引入        |
 
 > **个人项目建议：** 一期即可覆盖 90% 使用场景。Neo4j 和 ES 可在确认需求后再引入。
 
@@ -278,48 +278,48 @@
     入库完成
 ```
 
----
+***
 
 ## 4. 技术选型
 
 ### 4.1 后端技术栈
 
-| 技术 | 版本 | 用途 | Maven Artifact |
-|---|---|---|---|
-| Java | 17+ | 开发语言 | - |
-| Spring Boot | 3.4.x | 应用框架 | spring-boot-starter-parent |
-| Spring AI | 1.0.0 (GA) | AI 集成框架 | spring-ai-bom (BOM) |
-| - Chat 模型 | - | 对话能力 | spring-ai-openai |
-| - Embedding 模型 | - | 向量化 | spring-ai-openai（OpenAI兼容） |
-| - pgvector | - | 向量存储 | spring-ai-starter-vector-store-pgvector |
-| PostgreSQL | 16 | 业务数据存储 | postgresql |
-| Neo4j | 5.x | 知识图谱存储（二期可选） | spring-boot-starter-neo4j |
-| Elasticsearch | 8.x | BM25 关键词检索（三期可选，一期用 PG tsvector） | spring-ai-starter-vector-store-elasticsearch |
-| Redis | 7.x | 会话缓存 + 对话记忆（二期可选） | spring-boot-starter-data-redis |
-| MinIO | 最新稳定版 | 文件对象存储 | minio |
-| Spring Data JPA | - | ORM 框架 | spring-boot-starter-data-jpa |
-| Lombok | - | 代码简化 | lombok |
-| MapStruct | - | 对象转换 | mapstruct |
+| 技术              | 版本         | 用途                               | Maven Artifact                               |
+| --------------- | ---------- | -------------------------------- | -------------------------------------------- |
+| Java            | 17+        | 开发语言                             | -                                            |
+| Spring Boot     | 3.4.x      | 应用框架                             | spring-boot-starter-parent                   |
+| Spring AI       | 1.0.0 (GA) | AI 集成框架                          | spring-ai-bom (BOM)                          |
+| - Chat 模型       | -          | 对话能力                             | spring-ai-openai                             |
+| - Embedding 模型  | -          | 向量化                              | spring-ai-openai（OpenAI兼容）                   |
+| - pgvector      | -          | 向量存储                             | spring-ai-starter-vector-store-pgvector      |
+| PostgreSQL      | 16         | 业务数据存储                           | postgresql                                   |
+| Neo4j           | 5.x        | 知识图谱存储（二期可选）                     | spring-boot-starter-neo4j                    |
+| Elasticsearch   | 8.x        | BM25 关键词检索（三期可选，一期用 PG tsvector） | spring-ai-starter-vector-store-elasticsearch |
+| Redis           | 7.x        | 会话缓存 + 对话记忆（二期可选）                | spring-boot-starter-data-redis               |
+| MinIO           | 最新稳定版      | 文件对象存储                           | minio                                        |
+| Spring Data JPA | -          | ORM 框架                           | spring-boot-starter-data-jpa                 |
+| Lombok          | -          | 代码简化                             | lombok                                       |
+| MapStruct       | -          | 对象转换                             | mapstruct                                    |
 
 ### 4.2 前端技术栈
 
-| 技术 | 用途 |
-|---|---|
-| React 18 | UI 框架 |
-| Ant Design 5 | 组件库 |
-| @antv/g6 | 知识图谱可视化 |
-| react-markdown | Markdown 渲染 |
-| SSE EventSource | 流式对话 |
+| 技术              | 用途          |
+| --------------- | ----------- |
+| React 18        | UI 框架       |
+| Ant Design 5    | 组件库         |
+| @antv/g6        | 知识图谱可视化     |
+| react-markdown  | Markdown 渲染 |
+| SSE EventSource | 流式对话        |
 
 ### 4.3 AI 模型选型建议
 
-| 模型类型 | 推荐方案 | 备选方案 |
-|---|---|---|
-| Chat 模型 | 阿里通义千问 / DeepSeek | OpenAI GPT-4o / 本地 Ollama |
-| Embedding 模型 | text-embedding-v3 / bge-large-zh | m3e-base |
-| 实体抽取模型 | 复用 Chat 模型 + Prompt | 专用 NER 模型 |
+| 模型类型         | 推荐方案                             | 备选方案                      |
+| ------------ | -------------------------------- | ------------------------- |
+| Chat 模型      | 阿里通义千问 / DeepSeek                | OpenAI GPT-4o / 本地 Ollama |
+| Embedding 模型 | text-embedding-v3 / bge-large-zh | m3e-base                  |
+| 实体抽取模型       | 复用 Chat 模型 + Prompt              | 专用 NER 模型                 |
 
----
+***
 
 ## 5. 核心模块详细设计
 
@@ -421,12 +421,12 @@ RRF_score(d) = Σ(k=1 to N) 1 / (k + rank_k(d))
 
 根据查询类型自动调整各检索引擎权重：
 
-| 查询类型 | 判断条件 | BM25权重 | 向量权重 | 图谱权重 |
-|---|---|---|---|---|
-| 精确查询 | 含专有名词/数字/代码 | 50% | 30% | 20% |
-| 概念查询 | 含「是什么」「定义」 | 20% | 50% | 30% |
-| 关系查询 | 含「关系」「关联」「依赖」 | 10% | 30% | 60% |
-| 综合查询 | 默认 | 30% | 50% | 20% |
+| 查询类型 | 判断条件          | BM25权重 | 向量权重 | 图谱权重 |
+| ---- | ------------- | ------ | ---- | ---- |
+| 精确查询 | 含专有名词/数字/代码   | 50%    | 30%  | 20%  |
+| 概念查询 | 含「是什么」「定义」    | 20%    | 50%  | 30%  |
+| 关系查询 | 含「关系」「关联」「依赖」 | 10%    | 30%  | 60%  |
+| 综合查询 | 默认            | 30%    | 50%  | 20%  |
 
 ### 5.3 知识图谱模块（GraphService）
 
@@ -695,7 +695,7 @@ private double calculateGraphCoverage(String topic) {
 }
 ```
 
----
+***
 
 ## 6. 项目结构设计
 
@@ -857,11 +857,11 @@ knowledge-forge-ai/
 
 ### 6.2 包结构组织原则
 
-| 维度 | 策略 | 说明 |
-|---|---|---|
-| **一级组织** | **按功能垂直划分** | `chat/`、`knowledge/`、`retrieval/`、`graph/` 各自为独立功能域 |
-| **二级组织** | **按技术分层** | 每个功能模块内部有 `controller/`、`service/`、`dto/`、`entity/`、`repository/` |
-| **全局组件** | **按类型集中** | `config/`、`shared/`、`document/` 存放跨功能共享代码 |
+| 维度       | 策略          | 说明                                                                |
+| -------- | ----------- | ----------------------------------------------------------------- |
+| **一级组织** | **按功能垂直划分** | `chat/`、`knowledge/`、`retrieval/`、`graph/` 各自为独立功能域               |
+| **二级组织** | **按技术分层**   | 每个功能模块内部有 `controller/`、`service/`、`dto/`、`entity/`、`repository/` |
+| **全局组件** | **按类型集中**   | `config/`、`shared/`、`document/` 存放跨功能共享代码                         |
 
 ### 6.3 模块依赖关系
 
@@ -892,17 +892,18 @@ knowledge-forge-ai/
 ```
 
 **依赖方向规则：**
+
 - 底层模块（shared、document）**不能依赖**上层模块
 - 上层模块**只能依赖**下层模块，禁止横向跨模块直接调用
 - 跨模块通信通过 **事件（Spring ApplicationEvent）** 或 **公共接口** 实现
 
 ### 6.4 资源文件组织
 
-| 目录 | 用途 | 示例 |
-|---|---|---|
-| `resources/prompts/` | LLM Prompt 模板（`.st` 文件） | `system-prompt.st` |
-| `resources/db/migration/` | Flyway 数据库版本迁移脚本 | `V1__init_schema.sql` |
-| `resources/application-{profile}.yml` | 环境配置 | `application-dev.yml` |
+| 目录                                    | 用途                      | 示例                    |
+| ------------------------------------- | ----------------------- | --------------------- |
+| `resources/prompts/`                  | LLM Prompt 模板（`.st` 文件） | `system-prompt.st`    |
+| `resources/db/migration/`             | Flyway 数据库版本迁移脚本        | `V1__init_schema.sql` |
+| `resources/application-{profile}.yml` | 环境配置                    | `application-dev.yml` |
 
 ### 6.5 Maven 依赖结构（pom.xml 核心配置）
 
@@ -1004,17 +1005,19 @@ knowledge-forge-ai/
 </project>
 ```
 
----
+***
 
 ## 7. 数据库设计
 
 > **重要说明：** Spring AI 1.0 的 `PgVectorStore` 默认使用 `vector_store` 作为表名。
-> 本项目采用 **自定义表（document_chunk）** 存储向量和业务数据，原因：
+> 本项目采用 **自定义表（document\_chunk）** 存储向量和业务数据，原因：
+>
 > 1. Spring AI 默认表无 `hierarchy_path`、`document_id` 等业务字段
 > 2. 自定义表支持知识溯源和层级扩展
 > 3. 需要在 Bean 配置中指定 `vectorTableName = "document_chunk"`
 >
 > 配置方式：
+>
 > ```java
 > @Bean
 > public PgVectorStore pgVectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel embeddingModel) {
@@ -1030,7 +1033,7 @@ knowledge-forge-ai/
 
 ### 6.1 PostgreSQL 核心表
 
-#### 知识库表（knowledge_base）
+#### 知识库表（knowledge\_base）
 
 ```sql
 CREATE TABLE knowledge_base (
@@ -1069,7 +1072,7 @@ CREATE INDEX idx_document_kb_id ON document(kb_id);
 CREATE INDEX idx_document_deleted ON document(deleted);
 ```
 
-#### 文档块表（document_chunk）
+#### 文档块表（document\_chunk）
 
 ```sql
 CREATE TABLE document_chunk (
@@ -1118,7 +1121,7 @@ CREATE TABLE conversation_kb (
 );
 ```
 
-#### 对话消息表（chat_message）
+#### 对话消息表（chat\_message）
 
 ```sql
 CREATE TABLE chat_message (
@@ -1135,7 +1138,7 @@ CREATE TABLE chat_message (
 CREATE INDEX idx_message_conversation_id ON chat_message(conversation_id);
 ```
 
-#### 知识卡片表（knowledge_card）
+#### 知识卡片表（knowledge\_card）
 
 ```sql
 CREATE TABLE knowledge_card (
@@ -1201,20 +1204,20 @@ CREATE FULLTEXT INDEX entity_name_fulltext_idx IF NOT EXISTS
 }
 ```
 
----
+***
 
 ## 7. API 接口设计
 
 ### 7.1 对话接口
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| POST | `/api/v1/chat/rag` | RAG 增强对话（SSE 流式） |
-| POST | `/api/v1/chat/simple` | 普通对话（不含知识库） |
-| GET | `/api/v1/conversations` | 获取对话列表 |
-| GET | `/api/v1/conversations/{id}/messages` | 获取对话消息 |
-| POST | `/api/v1/messages/{id}/feedback` | 提交答案反馈 |
-| DELETE | `/api/v1/conversations/{id}` | 删除对话 |
+| 方法     | 路径                                    | 说明               |
+| ------ | ------------------------------------- | ---------------- |
+| POST   | `/api/v1/chat/rag`                    | RAG 增强对话（SSE 流式） |
+| POST   | `/api/v1/chat/simple`                 | 普通对话（不含知识库）      |
+| GET    | `/api/v1/conversations`               | 获取对话列表           |
+| GET    | `/api/v1/conversations/{id}/messages` | 获取对话消息           |
+| POST   | `/api/v1/messages/{id}/feedback`      | 提交答案反馈           |
+| DELETE | `/api/v1/conversations/{id}`          | 删除对话             |
 
 #### RAG 对话请求体
 
@@ -1250,45 +1253,45 @@ data: {"messageId": "msg-001", "totalTokens": 1024}
 
 ### 7.2 知识库管理接口
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| POST | `/api/v1/knowledge-bases` | 创建知识库 |
-| GET | `/api/v1/knowledge-bases` | 获取知识库列表 |
-| PUT | `/api/v1/knowledge-bases/{id}` | 更新知识库 |
-| DELETE | `/api/v1/knowledge-bases/{id}` | 删除知识库 |
-| POST | `/api/v1/knowledge-bases/{id}/documents` | 上传文档（multipart） |
-| GET | `/api/v1/knowledge-bases/{id}/documents` | 获取文档列表 |
-| DELETE | `/api/v1/documents/{id}` | 删除文档 |
-| GET | `/api/v1/documents/{id}/chunks` | 获取文档分块详情 |
-| POST | `/api/v1/documents/{id}/reprocess` | 重新处理文档 |
+| 方法     | 路径                                       | 说明              |
+| ------ | ---------------------------------------- | --------------- |
+| POST   | `/api/v1/knowledge-bases`                | 创建知识库           |
+| GET    | `/api/v1/knowledge-bases`                | 获取知识库列表         |
+| PUT    | `/api/v1/knowledge-bases/{id}`           | 更新知识库           |
+| DELETE | `/api/v1/knowledge-bases/{id}`           | 删除知识库           |
+| POST   | `/api/v1/knowledge-bases/{id}/documents` | 上传文档（multipart） |
+| GET    | `/api/v1/knowledge-bases/{id}/documents` | 获取文档列表          |
+| DELETE | `/api/v1/documents/{id}`                 | 删除文档            |
+| GET    | `/api/v1/documents/{id}/chunks`          | 获取文档分块详情        |
+| POST   | `/api/v1/documents/{id}/reprocess`       | 重新处理文档          |
 
 ### 7.3 知识图谱接口
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| GET | `/api/v1/graph/entities` | 获取实体列表（分页） |
-| GET | `/api/v1/graph/entities/{name}` | 获取实体详情及关联 |
-| GET | `/api/v1/graph/subgraph` | 获取指定实体的子图（可视化用） |
-| GET | `/api/v1/graph/search` | 图谱搜索 |
+| 方法  | 路径                              | 说明              |
+| --- | ------------------------------- | --------------- |
+| GET | `/api/v1/graph/entities`        | 获取实体列表（分页）      |
+| GET | `/api/v1/graph/entities/{name}` | 获取实体详情及关联       |
+| GET | `/api/v1/graph/subgraph`        | 获取指定实体的子图（可视化用） |
+| GET | `/api/v1/graph/search`          | 图谱搜索            |
 
 ### 7.4 增量学习接口
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| GET | `/api/v1/knowledge-cards/pending` | 获取待审核知识卡片 |
-| POST | `/api/v1/knowledge-cards/{id}/approve` | 审核通过 |
-| POST | `/api/v1/knowledge-cards/{id}/reject` | 审核拒绝 |
-| GET | `/api/v1/knowledge-cards` | 获取已入库知识卡片 |
+| 方法   | 路径                                     | 说明        |
+| ---- | -------------------------------------- | --------- |
+| GET  | `/api/v1/knowledge-cards/pending`      | 获取待审核知识卡片 |
+| POST | `/api/v1/knowledge-cards/{id}/approve` | 审核通过      |
+| POST | `/api/v1/knowledge-cards/{id}/reject`  | 审核拒绝      |
+| GET  | `/api/v1/knowledge-cards`              | 获取已入库知识卡片 |
 
 ### 7.5 主动发现接口
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| GET | `/api/v1/discovery/gaps` | 获取知识盲区列表 |
-| GET | `/api/v1/discovery/recommendations` | 获取知识推荐 |
-| GET | `/api/v1/discovery/learning-path` | 获取推荐学习路径 |
+| 方法  | 路径                                  | 说明       |
+| --- | ----------------------------------- | -------- |
+| GET | `/api/v1/discovery/gaps`            | 获取知识盲区列表 |
+| GET | `/api/v1/discovery/recommendations` | 获取知识推荐   |
+| GET | `/api/v1/discovery/learning-path`   | 获取推荐学习路径 |
 
----
+***
 
 ## 8. 前端页面规划
 
@@ -1328,7 +1331,7 @@ data: {"messageId": "msg-001", "totalTokens": 1024}
     └── 知识推荐卡片
 ```
 
----
+***
 
 ## 9. 部署架构
 
@@ -1431,6 +1434,7 @@ spring:
 ```
 
 > **数据库扩展要求：** PostgreSQL 需要启用以下扩展：
+>
 > ```sql
 > CREATE EXTENSION IF NOT EXISTS vector;          -- pgvector 向量支持
 > CREATE EXTENSION IF NOT EXISTS hstore;          -- Spring AI pgvector 需要
@@ -1443,6 +1447,7 @@ spring:
 > **中文分词说明：** PostgreSQL 内置的 tsvector 对英文支持良好，但对中文需要额外的分词扩展。
 > 推荐使用 `zhparser`（基于 SCWS）或 `pg_jieba`（基于 Jieba）。
 > Docker 镜像可预装：
+>
 > ```dockerfile
 > FROM pgvector/pgvector:pg16
 > RUN apt-get update && apt-get install -y \
@@ -1450,152 +1455,5 @@ spring:
 >     && rm -rf /var/lib/apt/lists/*
 > ```
 
-# 方案二：使用阿里云百炼 DashScope（需引入 spring-ai-dashscope-spring-boot-starter）
-# spring:
-#   ai:
-#     dashscope:
-#       api-key: ${DASHSCOPE_API_KEY}
-#       chat:
-#         options:
-#           model: qwen-plus
-#           temperature: 0.7
-#       embedding:
-#         options:
-#           model: text-embedding-v3
+<br />
 
-knowledgeforge:
-  chunk:
-    max-tokens: 1024
-    overlap-tokens: 100
-  retrieval:
-    top-k: 5
-    hybrid:
-      bm25-weight: 0.3
-      vector-weight: 0.5
-      graph-weight: 0.2
-  credibility:
-    similarity-weight: 0.4
-    freshness-weight: 0.2
-    diversity-weight: 0.2
-    history-weight: 0.2
-    freshness-decay-days: 90
-```
-
----
-
-## 10. 开发排期建议
-
-### 第一阶段：基础 RAG 对话（2周）
-
-| 任务 | 预估工时 | 输出 |
-|---|---|---|
-| 项目脚手架搭建（Spring Boot + 依赖） | 1天 | 可运行的空项目 |
-| PostgreSQL + pgvector 集成 | 1天 | 向量存储可用 |
-| 文档上传 + 基础 ETL 流程 | 3天 | 文档入库 + 简单检索 |
-| 基础 RAG 对话（QuestionAnswerAdvisor） | 2天 | 单一知识库问答 |
-| 前端对话界面（React + SSE 流式） | 3天 | 基础对话可用 |
-
-### 第二阶段：自适应分块 + 混合检索（1.5周）
-
-| 任务 | 预估工时 | 输出 |
-|---|---|---|
-| 自适应语义分块实现 | 3天 | 三级分块策略 |
-| PostgreSQL tsvector BM25 索引集成 | 1天 | 关键词检索可用（无需 ES） |
-| 混合检索 RRF 融合 + 轻量级 ReRank | 2天 | 双策略检索（向量 + BM25） |
-| 动态权重调整策略 | 1天 | 根据查询类型自适应调整 |
-
-### 第三阶段：知识图谱（2.5周）
-
-| 任务 | 预估工时 | 输出 |
-|---|---|---|
-| Neo4j 集成 + Schema 设计 | 2天 | 图谱基础设施 |
-| 实体关系抽取 Pipeline | 3天 | 自动抽取实体关系 |
-| 图谱推理检索 | 3天 | 二阶段推理检索 |
-| 前端图谱可视化 | 4天 | 力导向图 + 交互 |
-
-### 第四阶段：可信度溯源 + 主动发现（1.5周）
-
-| 任务 | 预估工时 | 输出 |
-|---|---|---|
-| ProvenanceAdvisor 实现 | 2天 | 回答附带来源追溯 |
-| 可信度评分算法 | 2天 | 多维度评分 |
-| 知识盲区检测 | 2天 | 主动发现知识缺口 |
-| 前端溯源面板 + 盲区提示 | 1天 | UI 展示 |
-
-### 第五阶段：增量学习 + 知识沉淀（1.5周）
-
-| 任务 | 预估工时 | 输出 |
-|---|---|---|
-| 对话知识提取 Pipeline | 2天 | 自动提取可沉淀知识 |
-| 知识卡片审核流程 | 2天 | 用户审核界面 + 入库 |
-| 知识卡片入库（向量+图谱+ES） | 1天 | 三路同步写入 |
-| 端到端联调测试 | 2天 | 全流程验证 |
-
----
-
-> **总预估工期：约 9.5 周（单人开发），建议 2 人协作可压缩至 6-7 周。**
-
----
-
-## 附录：与 know-hub-ai 的关键差异总结
-
-| 对比项 | know-hub-ai | KnowledgeForge AI |
-|---|---|---|
-| 检索引擎数量 | 1（pgvector） | 1（一期） → 3（pgvector + ES + Neo4j，三期） |
-| 分块策略 | 默认固定大小 | 三级自适应语义分块 |
-| 知识组织方式 | 文件夹式知识库隔离 | 知识图谱实体关系网络（二期引入） |
-| 答案透明度 | 基础来源引用 | 完整溯源链 + 可信度评分 |
-| 知识增长方式 | 纯手动上传 | 手动上传 + 对话增量沉淀 |
-| 主动服务 | 无 | 知识盲区检测 + 主动推荐 |
-| 反馈机制 | 无 | 答案质量反馈闭环 |
-| 多模态 | 支持（图片+文档） | 暂不聚焦多模态 |
-| 基础设施复杂度 | 低（PG + MinIO） | 低（一期：PG）→ 较高（全量） |
-
----
-
-## 附录B：常见问题排查指南（摘要）
-
-> 完整排查指南已整合至本项目——以下为最高频问题的快速索引。
-
-### B.1 环境搭建
-
-| 问题 | 快速解决 |
-|------|----------|
-| Docker 容器启动失败 | 检查端口占用 `netstat -ano \| findstr "5432"`，确保 Docker Desktop 分配 ≥8GB 内存 |
-| pgvector 扩展不可用 | 使用 `pgvector/pgvector:pg16` 镜像，而非 `postgres:16` |
-| Neo4j 认证失败 | 首次启动后密码固化，需 `docker-compose down -v neo4j` 重建 |
-
-### B.2 Spring AI 配置
-
-| 问题 | 快速解决 |
-|------|----------|
-| 版本不匹配 | Spring Boot 3.4.x ↔ Spring AI 1.0.0 (GA)，需配置 `spring-ai-bom` |
-| Artifact 找不到 | Spring AI 1.0 重构了命名：`spring-ai-openai`(新) 替代 `spring-ai-openai-spring-boot-starter`(旧) |
-| ChatClient API 变化 | `AiClient` → `ChatClient.Builder`，`AiResponse` → `ChatResponse` |
-| LLM 配置文件缺失 | 复制 `llm.yml.example` → `llm.yml`，填入 API Key |
-
-### B.3 向量数据库（pgvector）
-
-| 问题 | 快速解决 |
-|------|----------|
-| 向量维度不匹配 | `bge-large-zh` = 1024维，`m3e-base` = 768维，需与建表 `vector(N)` 一致 |
-| 检索变慢(>500ms) | 创建 HNSW 索引：`CREATE INDEX ON document_chunk USING hnsw (embedding vector_cosine_ops)` |
-| similaritySearch 返回空 | 降低 `similarityThreshold` 至 0.3 排查，确认向量库有数据 |
-
-### B.4 常见配置项速查
-
-```bash
-# 环境变量（Windows PowerShell）
-$env:AI_API_KEY="your-api-key"
-$env:AI_BASE_URL="https://api.siliconflow.cn"
-$env:PG_PASSWORD="your-db-password"
-$env:MINIO_ACCESS_KEY="minioadmin"
-$env:MINIO_SECRET_KEY="minioadmin"
-
-# 环境变量（Linux / macOS）
-export AI_API_KEY="your-api-key"
-export AI_BASE_URL="https://api.siliconflow.cn"
-export PG_PASSWORD="your-db-password"
-export MINIO_ACCESS_KEY="minioadmin"
-export MINIO_SECRET_KEY="minioadmin"
-```
