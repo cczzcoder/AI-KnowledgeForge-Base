@@ -9,7 +9,13 @@ interface KnowledgeFormProps {
   onCancel: () => void;
 }
 
-function KnowledgeForm({ open, title, initialValues, onOk, onCancel }: KnowledgeFormProps) {
+function KnowledgeForm({
+  open,
+  title,
+  initialValues,
+  onOk,
+  onCancel,
+}: KnowledgeFormProps) {
   const [form] = Form.useForm<KnowledgeBaseDTO>();
 
   const handleOk = async () => {
@@ -58,10 +64,7 @@ function KnowledgeForm({ open, title, initialValues, onOk, onCancel }: Knowledge
           label="描述"
           rules={[{ max: 2000, message: '描述不能超过2000个字符' }]}
         >
-          <Input.TextArea
-            rows={3}
-            placeholder="知识库的简要描述（选填）"
-          />
+          <Input.TextArea rows={3} placeholder="知识库的简要描述（选填）" />
         </Form.Item>
 
         <Form.Item

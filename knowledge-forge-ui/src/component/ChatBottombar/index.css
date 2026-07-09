@@ -20,7 +20,9 @@
   border: 1px solid #d9d9d9;
   border-radius: 12px;
   padding: 8px 12px;
-  transition: border-color 0.3s, background 0.3s;
+  transition:
+    border-color 0.3s,
+    background 0.3s;
 }
 
 .chat-bottombar.dark .chat-bottombar-input {

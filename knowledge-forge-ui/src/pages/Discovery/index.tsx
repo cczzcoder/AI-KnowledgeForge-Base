@@ -1,9 +1,42 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Spin, Empty, Card, Tag, Typography, Space, Select, List, Progress, Alert, Button, Steps, message, Divider, Collapse } from 'antd';
-import { ArrowLeftOutlined, ReloadOutlined, SearchOutlined, BulbOutlined, CompassOutlined, RocketOutlined, CheckCircleOutlined, AimOutlined, TrophyOutlined } from '@ant-design/icons';
+import {
+  Spin,
+  Empty,
+  Card,
+  Tag,
+  Typography,
+  Space,
+  Select,
+  List,
+  Progress,
+  Alert,
+  Button,
+  Steps,
+  message,
+  Divider,
+  Collapse,
+} from 'antd';
+import {
+  ArrowLeftOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  BulbOutlined,
+  CompassOutlined,
+  RocketOutlined,
+  CheckCircleOutlined,
+  AimOutlined,
+  TrophyOutlined,
+} from '@ant-design/icons';
 import { listAllKnowledgeBases } from '@/services/knowledgeBaseController';
-import { getKnowledgeGaps, getRecommendations, getLearningPath, type KnowledgeGap, type Recommendation, type LearningPath } from '@/services/discoveryController';
+import {
+  getKnowledgeGaps,
+  getRecommendations,
+  getLearningPath,
+  type KnowledgeGap,
+  type Recommendation,
+  type LearningPath,
+} from '@/services/discoveryController';
 import './index.css';
 
 const { Text, Title } = Typography;
@@ -13,18 +46,25 @@ function DiscoveryPage() {
   const navigate = useNavigate();
 
   const [kbs, setKbs] = useState<{ id: string; name: string }[]>([]);
-  const [selectedKbId, setSelectedKbId] = useState<string | undefined>(knowledgeBaseId);
+  const [selectedKbId, setSelectedKbId] = useState<string | undefined>(
+    knowledgeBaseId,
+  );
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'gaps' | 'recommendations' | 'learning'>('gaps');
+  const [activeTab, setActiveTab] = useState<
+    'gaps' | 'recommendations' | 'learning'
+  >('gaps');
 
   const [gaps, setGaps] = useState<KnowledgeGap[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
   const [learningPathTopic, setLearningPathTopic] = useState('');
 
-  const reportBackgroundError = useCallback((context: string, error: unknown) => {
-    console.warn(`[DiscoveryPage] ${context}`, error);
-  }, []);
+  const reportBackgroundError = useCallback(
+    (context: string, error: unknown) => {
+      console.warn(`[DiscoveryPage] ${context}`, error);
+    },
+    [],
+  );
 
   const loadKnowledgeBases = useCallback(async () => {
     try {
@@ -63,20 +103,23 @@ function DiscoveryPage() {
     }
   }, [selectedKbId, knowledgeBaseId]);
 
-  const loadLearningPath = useCallback(async (topic: string) => {
-    const kbId = selectedKbId || knowledgeBaseId;
-    if (!kbId || !topic) return;
-    setLearningPathTopic(topic);
-    setLoading(true);
-    try {
-      const res = await getLearningPath(kbId, topic);
-      setLearningPath(res.data || null);
-    } catch {
-      message.error('获取学习路径失败');
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedKbId, knowledgeBaseId]);
+  const loadLearningPath = useCallback(
+    async (topic: string) => {
+      const kbId = selectedKbId || knowledgeBaseId;
+      if (!kbId || !topic) return;
+      setLearningPathTopic(topic);
+      setLoading(true);
+      try {
+        const res = await getLearningPath(kbId, topic);
+        setLearningPath(res.data || null);
+      } catch {
+        message.error('获取学习路径失败');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [selectedKbId, knowledgeBaseId],
+  );
 
   useEffect(() => {
     loadKnowledgeBases();
@@ -101,7 +144,11 @@ function DiscoveryPage() {
         <Space>
           <ArrowLeftOutlined
             className="discovery-back-btn"
-            onClick={() => navigate(`/knowledge-base${knowledgeBaseId ? `/${knowledgeBaseId}` : ''}`)}
+            onClick={() =>
+              navigate(
+                `/knowledge-base${knowledgeBaseId ? `/${knowledgeBaseId}` : ''}`,
+              )
+            }
           />
           <Title level={4} style={{ margin: 0 }}>
             <CompassOutlined /> 主动知识发现
@@ -129,8 +176,16 @@ function DiscoveryPage() {
       <div className="discovery-tabs">
         {[
           { key: 'gaps' as const, icon: <SearchOutlined />, label: '知识盲区' },
-          { key: 'recommendations' as const, icon: <BulbOutlined />, label: '智能推荐' },
-          { key: 'learning' as const, icon: <RocketOutlined />, label: '学习路径' },
+          {
+            key: 'recommendations' as const,
+            icon: <BulbOutlined />,
+            label: '智能推荐',
+          },
+          {
+            key: 'learning' as const,
+            icon: <RocketOutlined />,
+            label: '学习路径',
+          },
         ].map((tab) => (
           <div
             key={tab.key}
@@ -148,7 +203,9 @@ function DiscoveryPage() {
         ) : loading ? (
           <div style={{ textAlign: 'center', padding: 60 }}>
             <Spin size="large" />
-            <div style={{ marginTop: 12, color: '#999', fontSize: 13 }}>正在分析知识库...</div>
+            <div style={{ marginTop: 12, color: '#999', fontSize: 13 }}>
+              正在分析知识库...
+            </div>
           </div>
         ) : (
           <>
@@ -173,7 +230,9 @@ function DiscoveryPage() {
                           size="small"
                           title={
                             <Space>
-                              <Tag color={getCoverageColor(gap.coverageLevel)}>{gap.coverageLevel}</Tag>
+                              <Tag color={getCoverageColor(gap.coverageLevel)}>
+                                {gap.coverageLevel}
+                              </Tag>
                               <Text strong>{gap.topic}</Text>
                             </Space>
                           }
@@ -204,7 +263,12 @@ function DiscoveryPage() {
                               <Text type="secondary">缺失子主题: </Text>
                               <Space wrap size={[4, 4]}>
                                 {gap.missingSubtopics.map((sub, i) => (
-                                  <Tag key={`${gap.topic}-sub-${i}`} color="orange">{sub}</Tag>
+                                  <Tag
+                                    key={`${gap.topic}-sub-${i}`}
+                                    color="orange"
+                                  >
+                                    {sub}
+                                  </Tag>
                                 ))}
                               </Space>
                             </div>
@@ -261,7 +325,12 @@ function DiscoveryPage() {
                             <div style={{ marginTop: 8 }}>
                               <Space wrap size={[4, 4]}>
                                 {rec.suggestedResources.map((res, i) => (
-                                  <Tag key={`${rec.topic}-res-${i}`} color="green">{res}</Tag>
+                                  <Tag
+                                    key={`${rec.topic}-res-${i}`}
+                                    color="green"
+                                  >
+                                    {res}
+                                  </Tag>
                                 ))}
                               </Space>
                             </div>
@@ -282,7 +351,9 @@ function DiscoveryPage() {
                   <>
                     <Alert
                       message={`学习路径：${learningPathTopic}`}
-                      description={learningPath.description || learningPath.summary}
+                      description={
+                        learningPath.description || learningPath.summary
+                      }
                       type="success"
                       showIcon
                       style={{ marginBottom: 24 }}
@@ -298,21 +369,45 @@ function DiscoveryPage() {
                             </Space>
                           ),
                           description: (
-                            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                            <Space
+                              direction="vertical"
+                              size={4}
+                              style={{ width: '100%' }}
+                            >
                               <Text type="secondary">{step.description}</Text>
-                              {(step.resources || step.recommendedResources).length > 0 && (
+                              {(step.resources || step.recommendedResources)
+                                .length > 0 && (
                                 <div>
                                   <Text strong>推荐资源：</Text>
-                                  <Space wrap size={[4, 4]} style={{ marginTop: 4 }}>
-                                    {(step.resources || step.recommendedResources).map((res, i) => (
-                                      <Tag key={`${step.title}-resource-${i}`} color="purple">{res}</Tag>
+                                  <Space
+                                    wrap
+                                    size={[4, 4]}
+                                    style={{ marginTop: 4 }}
+                                  >
+                                    {(
+                                      step.resources ||
+                                      step.recommendedResources
+                                    ).map((res, i) => (
+                                      <Tag
+                                        key={`${step.title}-resource-${i}`}
+                                        color="purple"
+                                      >
+                                        {res}
+                                      </Tag>
                                     ))}
                                   </Space>
                                 </div>
                               )}
                             </Space>
                           ),
-                          icon: index === 0 ? <AimOutlined /> : index === learningPath.steps.length - 1 ? <TrophyOutlined /> : <CheckCircleOutlined />,
+                          icon:
+                            index === 0 ? (
+                              <AimOutlined />
+                            ) : index === learningPath.steps.length - 1 ? (
+                              <TrophyOutlined />
+                            ) : (
+                              <CheckCircleOutlined />
+                            ),
                         }))}
                       />
                     </Card>
@@ -325,8 +420,12 @@ function DiscoveryPage() {
                           children: (
                             <Space direction="vertical" size={8}>
                               <Text>• 按步骤顺序逐步学习，避免跳跃式理解</Text>
-                              <Text>• 结合当前知识库中的已有内容，优先补足缺失部分</Text>
-                              <Text>• 学习完成后可回到知识盲区分析查看覆盖度变化</Text>
+                              <Text>
+                                • 结合当前知识库中的已有内容，优先补足缺失部分
+                              </Text>
+                              <Text>
+                                • 学习完成后可回到知识盲区分析查看覆盖度变化
+                              </Text>
                             </Space>
                           ),
                         },

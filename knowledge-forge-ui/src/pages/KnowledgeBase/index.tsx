@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, Button, Table, Space, App, Typography, Dropdown } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FolderOpenOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  FolderOpenOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import KnowledgeForm from '@/component/KnowledgeForm';
 import { knowledgeBaseController } from '@/services';
@@ -113,7 +119,8 @@ function KnowledgeBasePage() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
-      render: (text: string) => text ? new Date(text).toLocaleString('zh-CN') : '-',
+      render: (text: string) =>
+        text ? new Date(text).toLocaleString('zh-CN') : '-',
     },
     {
       title: '操作',
@@ -155,12 +162,18 @@ function KnowledgeBasePage() {
     <div className="knowledge-base-page">
       <div className="page-header">
         <div>
-          <Title level={3} style={{ margin: 0 }}>知识库管理</Title>
+          <Title level={3} style={{ margin: 0 }}>
+            知识库管理
+          </Title>
           <Paragraph type="secondary" style={{ margin: '4px 0 0 0' }}>
             管理您的知识库，上传文档以构建 RAG 检索能力
           </Paragraph>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={openCreateModal}
+        >
           新建知识库
         </Button>
       </div>
@@ -179,7 +192,15 @@ function KnowledgeBasePage() {
       <KnowledgeForm
         open={modalOpen}
         title={editingKb ? '编辑知识库' : '新建知识库'}
-        initialValues={editingKb ? { name: editingKb.name, description: editingKb.description, icon: editingKb.icon } : undefined}
+        initialValues={
+          editingKb
+            ? {
+                name: editingKb.name,
+                description: editingKb.description,
+                icon: editingKb.icon,
+              }
+            : undefined
+        }
         onOk={editingKb ? handleUpdate : handleCreate}
         onCancel={() => {
           setModalOpen(false);

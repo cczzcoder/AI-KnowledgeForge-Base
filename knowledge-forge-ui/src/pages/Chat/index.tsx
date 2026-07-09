@@ -3,8 +3,17 @@ import { App } from 'antd';
 import ChatWindow from '@/component/ChatWindow';
 import ChatBottombar from '@/component/ChatBottombar';
 import ChatConversation from '@/component/ChatConversation';
-import { chatController, conversationController, knowledgeBaseController } from '@/services';
-import type { ConversationDTO, KnowledgeBase, SourceDTO, CredibilityBreakdownDTO } from '@/services/typings.d';
+import {
+  chatController,
+  conversationController,
+  knowledgeBaseController,
+} from '@/services';
+import type {
+  ConversationDTO,
+  KnowledgeBase,
+  SourceDTO,
+  CredibilityBreakdownDTO,
+} from '@/services/typings.d';
 import './index.css';
 
 interface Message {
@@ -22,12 +31,18 @@ interface ChatPageProps {
   onToggleSidebar: () => void;
 }
 
-function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProps) {
+function ChatPage({
+  themeMode,
+  sidebarCollapsed,
+  onToggleSidebar,
+}: ChatPageProps) {
   const { message } = App.useApp();
   const [messagesState, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState<ConversationDTO[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [activeConversationId, setActiveConversationId] = useState<
+    string | null
+  >(null);
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
   const [chatMode, setChatMode] = useState<'rag' | 'simple'>('rag');
 
@@ -36,9 +51,12 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
   const mountedRef = useRef(true);
   const abortRef = useRef<AbortController | null>(null);
 
-  const reportBackgroundError = useCallback((context: string, error: unknown) => {
-    console.warn(`[ChatPage] ${context}`, error);
-  }, []);
+  const reportBackgroundError = useCallback(
+    (context: string, error: unknown) => {
+      console.warn(`[ChatPage] ${context}`, error);
+    },
+    [],
+  );
 
   useEffect(() => {
     return () => {
@@ -107,14 +125,20 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsgId
-              ? { id: Date.now().toString(), role: 'assistant' as const, content: answer, messageId }
+              ? {
+                  id: Date.now().toString(),
+                  role: 'assistant' as const,
+                  content: answer,
+                  messageId,
+                }
               : m,
           ),
         );
         loadConversations();
       } catch (err: any) {
         setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId));
-        const errorMsg = err?.response?.data?.message || err?.message || '请求失败，请重试';
+        const errorMsg =
+          err?.response?.data?.message || err?.message || '请求失败，请重试';
         message.error(errorMsg);
       } finally {
         setLoading(false);
@@ -130,7 +154,11 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
 
     try {
       await chatController.ragChatStream(
-        { message: content, kbId: kbId || undefined, conversationId: activeConversationId || undefined },
+        {
+          message: content,
+          kbId: kbId || undefined,
+          conversationId: activeConversationId || undefined,
+        },
         (text) => {
           fullContent += text;
           setMessages((prev) =>
@@ -147,7 +175,11 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantMsgId
-                ? { ...m, sources: metadata.sources, credibility: metadata.credibility }
+                ? {
+                    ...m,
+                    sources: metadata.sources,
+                    credibility: metadata.credibility,
+                  }
                 : m,
             ),
           );
@@ -157,7 +189,13 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantMsgId
-            ? { id: Date.now().toString(), role: 'assistant' as const, content: fullContent, sources: m.sources, credibility: m.credibility }
+            ? {
+                id: Date.now().toString(),
+                role: 'assistant' as const,
+                content: fullContent,
+                sources: m.sources,
+                credibility: m.credibility,
+              }
             : m,
         ),
       );
@@ -166,7 +204,8 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
     } catch (err: any) {
       if (err?.name !== 'AbortError') {
         setMessages((prev) => prev.filter((m) => m.id !== assistantMsgId));
-        const errorMsg = err?.response?.data?.message || err?.message || '请求失败，请重试';
+        const errorMsg =
+          err?.response?.data?.message || err?.message || '请求失败，请重试';
         message.error(errorMsg);
       }
     } finally {
@@ -228,7 +267,11 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
         isDark={isDark}
       />
       <div className={`chat-page-main ${isDark ? 'dark' : ''}`}>
-        <ChatWindow messages={messagesState} loading={loading} isDark={isDark} />
+        <ChatWindow
+          messages={messagesState}
+          loading={loading}
+          isDark={isDark}
+        />
         <ChatBottombar
           onSend={handleSend}
           onClear={handleClear}

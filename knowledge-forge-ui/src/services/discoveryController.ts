@@ -50,17 +50,33 @@ export interface LearningPath {
   example: LearningExample;
 }
 
-export async function getKnowledgeGaps(kbId: string): Promise<ApiResponse<KnowledgeGap[]>> {
-  const response = await request.get<ApiResponse<KnowledgeGap[]>>('/discovery/gaps', { params: { kbId } });
+export async function getKnowledgeGaps(
+  kbId: string,
+): Promise<ApiResponse<KnowledgeGap[]>> {
+  const response = await request.get<ApiResponse<KnowledgeGap[]>>(
+    '/discovery/gaps',
+    { params: { kbId } },
+  );
   return response.data;
 }
 
-export async function getRecommendations(kbId: string): Promise<ApiResponse<Recommendation[]>> {
-  const response = await request.get<ApiResponse<Recommendation[]>>('/discovery/recommendations', { params: { kbId } });
+export async function getRecommendations(
+  kbId: string,
+): Promise<ApiResponse<Recommendation[]>> {
+  const response = await request.get<ApiResponse<Recommendation[]>>(
+    '/discovery/recommendations',
+    { params: { kbId } },
+  );
   return response.data;
 }
 
-export async function getLearningPath(kbId: string, topic: string): Promise<ApiResponse<LearningPath>> {
-  const response = await request.get<ApiResponse<LearningPath>>('/discovery/learning-path', { params: { kbId, topic } });
+export async function getLearningPath(
+  kbId: string,
+  topic: string,
+): Promise<ApiResponse<LearningPath>> {
+  const response = await request.get<ApiResponse<LearningPath>>(
+    '/discovery/learning-path',
+    { params: { kbId, topic } },
+  );
   return response.data;
 }

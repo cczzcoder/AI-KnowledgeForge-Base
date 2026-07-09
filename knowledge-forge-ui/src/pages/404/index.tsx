@@ -5,7 +5,14 @@ function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
+      }}
+    >
       <Result
         status="404"
         title="404"

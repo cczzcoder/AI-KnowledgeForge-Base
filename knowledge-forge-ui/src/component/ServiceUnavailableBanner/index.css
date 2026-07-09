@@ -8,7 +8,9 @@
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.35s ease, opacity 0.25s ease;
+  transition:
+    max-height 0.35s ease,
+    opacity 0.25s ease;
 }
 
 .service-unavailable-wrapper.visible {
@@ -26,8 +28,13 @@
 
 /* 图标脉冲动画 */
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .pulse-icon {

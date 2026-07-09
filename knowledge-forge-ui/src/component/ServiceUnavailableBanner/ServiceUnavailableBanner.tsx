@@ -38,7 +38,9 @@ function ServiceUnavailableBanner({ onRetry }: ServiceUnavailableBannerProps) {
 
     // 每分钟更新一次已持续时长
     timerRef.current = setInterval(() => {
-      setDowntimeMinutes(Math.floor((Date.now() - startTimeRef.current) / 60000));
+      setDowntimeMinutes(
+        Math.floor((Date.now() - startTimeRef.current) / 60000),
+      );
     }, 10000);
 
     return () => {
@@ -102,7 +104,9 @@ function ServiceUnavailableBanner({ onRetry }: ServiceUnavailableBannerProps) {
 
             <div className="contact-support">
               <CustomerServiceOutlined style={{ marginRight: 4 }} />
-              <Text type="secondary">如需帮助，请联系系统管理员或维护人员。</Text>
+              <Text type="secondary">
+                如需帮助，请联系系统管理员或维护人员。
+              </Text>
             </div>
           </div>
         }

@@ -1,5 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider, Layout, Menu, Typography, theme, App as AntApp, Avatar, Dropdown } from 'antd';
+import {
+  ConfigProvider,
+  Layout,
+  Menu,
+  Typography,
+  theme,
+  App as AntApp,
+  Avatar,
+  Dropdown,
+} from 'antd';
 import {
   RobotOutlined,
   BookOutlined,
@@ -137,7 +146,10 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
   }
 
   return (
-    <Layout className={`app-layout ${isDark ? 'dark' : 'light'}`} style={{ height: '100vh' }}>
+    <Layout
+      className={`app-layout ${isDark ? 'dark' : 'light'}`}
+      style={{ height: '100vh' }}
+    >
       {serviceUnavailable && (
         <ServiceUnavailableBanner onRetry={handleRetryConnection} />
       )}
@@ -209,9 +221,15 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
           }}
           theme={isDark ? 'dark' : 'light'}
         />
-        <div className="app-header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div
+          className="app-header-right"
+          style={{ display: 'flex', alignItems: 'center', gap: 16 }}
+        >
           <ThemeSwitcher value={themeMode} onChange={onThemeChange} />
-          <Dropdown menu={{ items: USER_MENU_ITEMS, onClick: handleUserMenuClick }} placement="bottomRight">
+          <Dropdown
+            menu={{ items: USER_MENU_ITEMS, onClick: handleUserMenuClick }}
+            placement="bottomRight"
+          >
             <Avatar
               size={32}
               icon={<UserOutlined />}
@@ -240,13 +258,25 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
             }
           />
           <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
-          <Route path="/knowledge-base/:knowledgeBaseId" element={<DocumentPage />} />
-          <Route path="/knowledge-base/:knowledgeBaseId/graph" element={<GraphPage />} />
+          <Route
+            path="/knowledge-base/:knowledgeBaseId"
+            element={<DocumentPage />}
+          />
+          <Route
+            path="/knowledge-base/:knowledgeBaseId/graph"
+            element={<GraphPage />}
+          />
           <Route path="/graph" element={<GraphPage />} />
           <Route path="/discovery" element={<DiscoveryPage />} />
-          <Route path="/discovery/:knowledgeBaseId" element={<DiscoveryPage />} />
+          <Route
+            path="/discovery/:knowledgeBaseId"
+            element={<DiscoveryPage />}
+          />
           <Route path="/knowledge-cards" element={<KnowledgeCardPage />} />
-          <Route path="/knowledge-cards/:knowledgeBaseId" element={<KnowledgeCardPage />} />
+          <Route
+            path="/knowledge-cards/:knowledgeBaseId"
+            element={<KnowledgeCardPage />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Content>

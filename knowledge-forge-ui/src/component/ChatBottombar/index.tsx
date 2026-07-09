@@ -16,9 +16,19 @@ interface ChatBottombarProps {
   onChatModeChange: (mode: 'rag' | 'simple') => void;
 }
 
-function ChatBottombar({ onSend, onClear, loading, knowledgeBases, isDark, chatMode, onChatModeChange }: ChatBottombarProps) {
+function ChatBottombar({
+  onSend,
+  onClear,
+  loading,
+  knowledgeBases,
+  isDark,
+  chatMode,
+  onChatModeChange,
+}: ChatBottombarProps) {
   const [inputValue, setInputValue] = useState('');
-  const [selectedKbId, setSelectedKbId] = useState<string | undefined>(undefined);
+  const [selectedKbId, setSelectedKbId] = useState<string | undefined>(
+    undefined,
+  );
   const textAreaRef = useRef<any>(null);
 
   useEffect(() => {

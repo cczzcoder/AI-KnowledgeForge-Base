@@ -1,12 +1,5 @@
 {
-  "*.{md,json}": [
-    "prettier --cache --write"
-  ],
-  "*.{js,jsx,ts,tsx}": [
-    "eslint --fix",
-    "prettier --cache --write"
-  ],
-  "*.{css,less}": [
-    "prettier --cache --write"
-  ]
+  "*.{md,json}": ["prettier --cache --write"],
+  "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --cache --write"],
+  "*.{css,less}": ["prettier --cache --write"]
 }

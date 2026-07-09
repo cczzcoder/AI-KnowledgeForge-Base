@@ -1,5 +1,11 @@
 import request from './request';
-import type { ApiResponse, ChatRequest, ChatResponse, CredibilityBreakdownDTO, SourceDTO } from './typings.d';
+import type {
+  ApiResponse,
+  ChatRequest,
+  ChatResponse,
+  CredibilityBreakdownDTO,
+  SourceDTO,
+} from './typings.d';
 
 const API_BASE = '/api/v1';
 
@@ -15,7 +21,11 @@ export async function ragChatStream(
   body: ChatRequest,
   onChunk: (text: string) => void,
   signal?: AbortSignal,
-  onMetadata?: (metadata: { conversationId: string; sources: SourceDTO[]; credibility?: CredibilityBreakdownDTO }) => void,
+  onMetadata?: (metadata: {
+    conversationId: string;
+    sources: SourceDTO[];
+    credibility?: CredibilityBreakdownDTO;
+  }) => void,
 ): Promise<void> {
   const response = await fetch(`${API_BASE}/chat/rag/stream`, {
     method: 'POST',
@@ -64,5 +74,8 @@ export async function ragChatStream(
 }
 
 export async function submitFeedback(messageId: string, feedback: string) {
-  return request.patch<ApiResponse<null>>(`/chat/messages/${messageId}/feedback`, { feedback });
+  return request.patch<ApiResponse<null>>(
+    `/chat/messages/${messageId}/feedback`,
+    { feedback },
+  );
 }

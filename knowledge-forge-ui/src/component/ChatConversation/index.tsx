@@ -1,5 +1,10 @@
 import { List, Button, Popconfirm, Typography } from 'antd';
-import { DeleteOutlined, MessageOutlined, PlusOutlined, MenuFoldOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  MessageOutlined,
+  PlusOutlined,
+  MenuFoldOutlined,
+} from '@ant-design/icons';
 import type { ConversationDTO } from '@/services/typings.d';
 import './index.css';
 
@@ -27,10 +32,17 @@ function ChatConversation({
   isDark,
 }: ChatConversationProps) {
   return (
-    <div className={`chat-conversation ${isDark ? 'dark' : ''} ${collapsed ? 'collapsed' : ''}`}>
+    <div
+      className={`chat-conversation ${isDark ? 'dark' : ''} ${collapsed ? 'collapsed' : ''}`}
+    >
       <div className="chat-conversation-header">
         <div className="chat-conversation-header-top">
-          <Button type="primary" icon={<PlusOutlined />} onClick={onNew} className="new-chat-btn">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={onNew}
+            className="new-chat-btn"
+          >
             {!collapsed && '新建对话'}
           </Button>
           <Button
@@ -75,10 +87,18 @@ function ChatConversation({
               }
             >
               <List.Item.Meta
-                avatar={<MessageOutlined style={{ fontSize: 18, color: '#1677ff' }} />}
+                avatar={
+                  <MessageOutlined style={{ fontSize: 18, color: '#1677ff' }} />
+                }
                 title={
                   !collapsed ? (
-                    <Text ellipsis style={{ maxWidth: 140, color: isDark ? '#e8e8e8' : undefined }}>
+                    <Text
+                      ellipsis
+                      style={{
+                        maxWidth: 140,
+                        color: isDark ? '#e8e8e8' : undefined,
+                      }}
+                    >
                       {item.title}
                     </Text>
                   ) : null

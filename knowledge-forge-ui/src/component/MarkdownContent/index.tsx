@@ -36,7 +36,9 @@ function MarkdownContent({ content }: MarkdownContentProps) {
           }
 
           return (
-            <div style={{ position: 'relative', marginTop: 8, marginBottom: 8 }}>
+            <div
+              style={{ position: 'relative', marginTop: 8, marginBottom: 8 }}
+            >
               <div
                 style={{
                   display: 'flex',

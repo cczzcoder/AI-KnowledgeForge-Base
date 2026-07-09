@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Avatar, Button, Space, App, Tooltip, Progress, Tag } from 'antd';
-import { UserOutlined, RobotOutlined, LikeOutlined, DislikeOutlined, LikeFilled, DislikeFilled, SafetyCertificateOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  RobotOutlined,
+  LikeOutlined,
+  DislikeOutlined,
+  LikeFilled,
+  DislikeFilled,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import MarkdownContent from '@/component/MarkdownContent';
 import { chatController } from '@/services';
 import type { SourceDTO, CredibilityBreakdownDTO } from '@/services/typings.d';
@@ -14,7 +22,13 @@ interface ChatMessageProps {
   messageId?: string;
 }
 
-function ChatMessageComponent({ role, content, sources, credibility, messageId }: ChatMessageProps) {
+function ChatMessageComponent({
+  role,
+  content,
+  sources,
+  credibility,
+  messageId,
+}: ChatMessageProps) {
   const { message } = App.useApp();
   const isUser = role === 'user';
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -32,7 +46,9 @@ function ChatMessageComponent({ role, content, sources, credibility, messageId }
   };
 
   return (
-    <div className={`chat-message ${isUser ? 'chat-message-user' : 'chat-message-assistant'}`}>
+    <div
+      className={`chat-message ${isUser ? 'chat-message-user' : 'chat-message-assistant'}`}
+    >
       <div className="chat-message-avatar">
         <Avatar
           size={36}
@@ -60,10 +76,18 @@ function ChatMessageComponent({ role, content, sources, credibility, messageId }
           <Tooltip
             title={
               <div style={{ fontSize: 12 }}>
-                <div>来源匹配度: {(credibility.similarityScore * 100).toFixed(0)}%</div>
-                <div>文档新鲜度: {(credibility.freshnessScore * 100).toFixed(0)}%</div>
-                <div>来源多样性: {(credibility.diversityScore * 100).toFixed(0)}%</div>
-                <div>历史验证度: {(credibility.historyScore * 100).toFixed(0)}%</div>
+                <div>
+                  来源匹配度: {(credibility.similarityScore * 100).toFixed(0)}%
+                </div>
+                <div>
+                  文档新鲜度: {(credibility.freshnessScore * 100).toFixed(0)}%
+                </div>
+                <div>
+                  来源多样性: {(credibility.diversityScore * 100).toFixed(0)}%
+                </div>
+                <div>
+                  历史验证度: {(credibility.historyScore * 100).toFixed(0)}%
+                </div>
               </div>
             }
           >
@@ -75,20 +99,28 @@ function ChatMessageComponent({ role, content, sources, credibility, messageId }
                 size="small"
                 style={{ width: 100, marginLeft: 8, marginBottom: 0 }}
                 strokeColor={
-                  credibility.overallScore >= 0.7 ? '#52c41a'
-                    : credibility.overallScore >= 0.4 ? '#faad14'
-                    : '#ff4d4f'
+                  credibility.overallScore >= 0.7
+                    ? '#52c41a'
+                    : credibility.overallScore >= 0.4
+                      ? '#faad14'
+                      : '#ff4d4f'
                 }
               />
               <Tag
                 color={
-                  credibility.overallScore >= 0.7 ? 'success'
-                    : credibility.overallScore >= 0.4 ? 'warning'
-                    : 'error'
+                  credibility.overallScore >= 0.7
+                    ? 'success'
+                    : credibility.overallScore >= 0.4
+                      ? 'warning'
+                      : 'error'
                 }
                 style={{ marginLeft: 8, fontSize: 11 }}
               >
-                {credibility.overallScore >= 0.7 ? '高' : credibility.overallScore >= 0.4 ? '中' : '低'}
+                {credibility.overallScore >= 0.7
+                  ? '高'
+                  : credibility.overallScore >= 0.4
+                    ? '中'
+                    : '低'}
               </Tag>
             </div>
           </Tooltip>
@@ -99,13 +131,25 @@ function ChatMessageComponent({ role, content, sources, credibility, messageId }
               <Button
                 type="text"
                 size="small"
-                icon={feedback === 'like' ? <LikeFilled style={{ color: '#1677ff' }} /> : <LikeOutlined />}
+                icon={
+                  feedback === 'like' ? (
+                    <LikeFilled style={{ color: '#1677ff' }} />
+                  ) : (
+                    <LikeOutlined />
+                  )
+                }
                 onClick={() => handleFeedback('like')}
               />
               <Button
                 type="text"
                 size="small"
-                icon={feedback === 'dislike' ? <DislikeFilled style={{ color: '#ff4d4f' }} /> : <DislikeOutlined />}
+                icon={
+                  feedback === 'dislike' ? (
+                    <DislikeFilled style={{ color: '#ff4d4f' }} />
+                  ) : (
+                    <DislikeOutlined />
+                  )
+                }
                 onClick={() => handleFeedback('dislike')}
               />
             </Space>

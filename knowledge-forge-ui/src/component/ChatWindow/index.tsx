@@ -40,8 +40,16 @@ function ChatWindow({ messages, loading, isDark }: ChatWindowProps) {
             />
           </div>
           <h2 style={{ color: isDark ? '#e8e8e8' : '#333' }}>知否</h2>
-          <p style={{ color: isDark ? '#8b8b9e' : '#999' }}>你的个人知识库AI助手</p>
-          <div className="empty-tips" style={{ background: isDark ? '#1a1a2e' : '#f5f5f5', color: isDark ? '#8b8b9e' : '#666' }}>
+          <p style={{ color: isDark ? '#8b8b9e' : '#999' }}>
+            你的个人知识库AI助手
+          </p>
+          <div
+            className="empty-tips"
+            style={{
+              background: isDark ? '#1a1a2e' : '#f5f5f5',
+              color: isDark ? '#8b8b9e' : '#666',
+            }}
+          >
             <span>在上方选择知识库，然后输入您的问题开始对话</span>
           </div>
         </div>

@@ -1,5 +1,10 @@
 import request from './request';
-import type { ApiResponse, DocumentDTO, DocumentChunkDTO, PageResult } from './typings.d';
+import type {
+  ApiResponse,
+  DocumentDTO,
+  DocumentChunkDTO,
+  PageResult,
+} from './typings.d';
 
 export async function uploadDocument(
   kbId: string,
@@ -8,21 +13,30 @@ export async function uploadDocument(
 ) {
   const formData = new FormData();
   formData.append('file', file);
-  return request.post<ApiResponse<DocumentDTO>>(`/knowledge-bases/${kbId}/documents`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: (progressEvent) => {
-      if (progressEvent.total && onProgress) {
-        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        onProgress(percent);
-      }
+  return request.post<ApiResponse<DocumentDTO>>(
+    `/knowledge-bases/${kbId}/documents`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total && onProgress) {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
+          onProgress(percent);
+        }
+      },
     },
-  });
+  );
 }
 
 export async function listDocuments(kbId: string, page = 0, size = 20) {
-  return request.get<ApiResponse<PageResult<DocumentDTO>>>(`/knowledge-bases/${kbId}/documents`, {
-    params: { page, size },
-  });
+  return request.get<ApiResponse<PageResult<DocumentDTO>>>(
+    `/knowledge-bases/${kbId}/documents`,
+    {
+      params: { page, size },
+    },
+  );
 }
 
 export async function getDocument(id: string) {
@@ -38,7 +52,9 @@ export async function reprocessDocument(id: string) {
 }
 
 export async function getChunks(id: string) {
-  return request.get<ApiResponse<DocumentChunkDTO[]>>(`/documents/${id}/chunks`);
+  return request.get<ApiResponse<DocumentChunkDTO[]>>(
+    `/documents/${id}/chunks`,
+  );
 }
 
 export async function downloadDocument(id: string, title: string) {

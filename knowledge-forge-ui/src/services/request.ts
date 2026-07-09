@@ -6,7 +6,9 @@ type ServiceStatusCallback = (unavailable: boolean) => void;
 const serviceStatusCallbacks: Set<ServiceStatusCallback> = new Set();
 
 /** 注册服务状态变化回调，返回取消注册函数 */
-export function onServiceStatusChange(callback: ServiceStatusCallback): () => void {
+export function onServiceStatusChange(
+  callback: ServiceStatusCallback,
+): () => void {
   serviceStatusCallbacks.add(callback);
   return () => serviceStatusCallbacks.delete(callback);
 }

@@ -12,7 +12,10 @@ export interface AuthVO {
   roles?: string[];
 }
 
-export async function login(body: UserLoginDTO, options?: Record<string, unknown>) {
+export async function login(
+  body: UserLoginDTO,
+  options?: Record<string, unknown>,
+) {
   return request.post<ApiResponse<AuthVO>>('/auth/login', body, options);
 }
 

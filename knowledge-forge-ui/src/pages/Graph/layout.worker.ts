@@ -5,8 +5,10 @@
 
 // ---- 力导向布局（简化版 FR 算法） ----
 interface ForceNode {
-  x: number; y: number;
-  vx: number; vy: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
   radius: number;
   id: string;
 }
@@ -22,18 +24,23 @@ function forceLayout(
   nodeRadiuses: number[],
 ): { x: number; y: number }[] {
   const nodes: ForceNode[] = [];
-  const W = 1400, H = 1050;
+  const W = 1400,
+    H = 1050;
   for (let i = 0; i < nodeCount; i++) {
     nodes.push({
       x: W / 2 + (Math.random() - 0.5) * 300,
       y: H / 2 + (Math.random() - 0.5) * 300,
-      vx: 0, vy: 0,
+      vx: 0,
+      vy: 0,
       radius: nodeRadiuses[i] || 20,
       id: String(i),
     });
   }
 
-  const linkEdges: ForceEdge[] = edges.map((e) => ({ source: e.sourceIndex, target: e.targetIndex }));
+  const linkEdges: ForceEdge[] = edges.map((e) => ({
+    source: e.sourceIndex,
+    target: e.targetIndex,
+  }));
   const iterations = 400;
   const alphaMin = 0.001;
   let alpha = 1;
@@ -141,7 +148,10 @@ function hierarchicalLayout(
         const cur = q.shift()!;
         comp.push(cur);
         for (const nb of undirected.get(cur) || []) {
-          if (!visited.has(nb)) { visited.add(nb); q.push(nb); }
+          if (!visited.has(nb)) {
+            visited.add(nb);
+            q.push(nb);
+          }
         }
       }
       components.push(comp);
@@ -160,8 +170,10 @@ function hierarchicalLayout(
 
   for (const compIds of components) {
     const degree = new Map<number, number>();
-    for (const id of compIds) degree.set(id, (undirected.get(id)?.size ?? 0));
-    const sorted = [...compIds].sort((a, b) => (degree.get(b) ?? 0) - (degree.get(a) ?? 0));
+    for (const id of compIds) degree.set(id, undirected.get(id)?.size ?? 0);
+    const sorted = [...compIds].sort(
+      (a, b) => (degree.get(b) ?? 0) - (degree.get(a) ?? 0),
+    );
     const centerId = sorted[0];
 
     const compLayerMap = new Map<number, number>();
@@ -177,7 +189,8 @@ function hierarchicalLayout(
         }
       }
     }
-    let nextLayer = compLayerMap.size > 0 ? Math.max(...compLayerMap.values()) + 1 : 0;
+    let nextLayer =
+      compLayerMap.size > 0 ? Math.max(...compLayerMap.values()) + 1 : 0;
     for (const id of compIds) {
       if (!compLayerMap.has(id)) compLayerMap.set(id, nextLayer++);
     }
@@ -196,17 +209,27 @@ function hierarchicalLayout(
       const forward = pass % 2 === 0;
       const range = forward
         ? Array.from({ length: layers.length - 1 }, (_, i) => i + 1)
-        : Array.from({ length: layers.length - 1 }, (_, i) => layers.length - 2 - i);
+        : Array.from(
+            { length: layers.length - 1 },
+            (_, i) => layers.length - 2 - i,
+          );
       for (const li of range) {
         const curLayer = layers[li];
         const barycenters = curLayer.map((id) => {
           const neighbors = undirected.get(id) || new Set();
-          let sum = 0, count = 0;
+          let sum = 0,
+            count = 0;
           for (const nb of neighbors) {
             const ord = nodeOrder.get(nb);
-            if (ord !== undefined) { sum += ord; count++; }
+            if (ord !== undefined) {
+              sum += ord;
+              count++;
+            }
           }
-          return { id, barycenter: count > 0 ? sum / count : Number.MAX_SAFE_INTEGER };
+          return {
+            id,
+            barycenter: count > 0 ? sum / count : Number.MAX_SAFE_INTEGER,
+          };
         });
         barycenters.sort((a, b) => a.barycenter - b.barycenter);
         barycenters.forEach((item, i) => nodeOrder.set(item.id, i));
@@ -243,7 +266,9 @@ function circularLayout(
   nodeCount: number,
   _nodeRadiuses: number[],
 ): { x: number; y: number }[] {
-  const cx = 600, cy = 450, r = Math.min(cx, cy) - 80;
+  const cx = 600,
+    cy = 450,
+    r = Math.min(cx, cy) - 80;
   const result: { x: number; y: number }[] = [];
   for (let i = 0; i < nodeCount; i++) {
     const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
@@ -253,12 +278,14 @@ function circularLayout(
 }
 
 // ---- Worker 消息处理 ----
-self.onmessage = (e: MessageEvent<{
-  type: 'force' | 'hierarchical' | 'circular';
-  nodeCount: number;
-  edges: { sourceIndex: number; targetIndex: number }[];
-  nodeRadiuses: number[];
-}>) => {
+self.onmessage = (
+  e: MessageEvent<{
+    type: 'force' | 'hierarchical' | 'circular';
+    nodeCount: number;
+    edges: { sourceIndex: number; targetIndex: number }[];
+    nodeRadiuses: number[];
+  }>,
+) => {
   const { type, nodeCount, edges, nodeRadiuses } = e.data;
   let positions: { x: number; y: number }[];
 

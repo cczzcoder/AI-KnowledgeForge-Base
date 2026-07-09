@@ -75,7 +75,9 @@ export async function listCards(params: {
 }
 
 /** 获取待审核数量 */
-export async function pendingCount(kbId: string): Promise<ApiResponse<{ count: number }>> {
+export async function pendingCount(
+  kbId: string,
+): Promise<ApiResponse<{ count: number }>> {
   return request.get('/knowledge-cards/pending-count', { params: { kbId } });
 }
 
@@ -88,7 +90,9 @@ export async function reviewCard(
 }
 
 /** 批量审核 */
-export async function batchReview(data: BatchReviewRequest): Promise<ApiResponse<{ reviewed: number }>> {
+export async function batchReview(
+  data: BatchReviewRequest,
+): Promise<ApiResponse<{ reviewed: number }>> {
   return request.post('/knowledge-cards/batch-review', data);
 }
 

@@ -50,11 +50,17 @@ const CATEGORY_MAP: Record<string, { color: string; label: string }> = {
 };
 
 export default function KnowledgeCardPage() {
-  const { knowledgeBaseId: paramKbId } = useParams<{ knowledgeBaseId?: string }>();
+  const { knowledgeBaseId: paramKbId } = useParams<{
+    knowledgeBaseId?: string;
+  }>();
   const navigate = useNavigate();
 
-  const [knowledgeBases, setKnowledgeBases] = useState<{ id: string; name: string }[]>([]);
-  const [selectedKbId, setSelectedKbId] = useState<string | undefined>(paramKbId);
+  const [knowledgeBases, setKnowledgeBases] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [selectedKbId, setSelectedKbId] = useState<string | undefined>(
+    paramKbId,
+  );
   const kbId = selectedKbId || '';
 
   const [cards, setCards] = useState<KnowledgeCardDTO[]>([]);
@@ -68,8 +74,12 @@ export default function KnowledgeCardPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [reviewingCard, setReviewingCard] = useState<KnowledgeCardDTO | null>(null);
-  const [reviewAction, setReviewAction] = useState<'APPROVED' | 'REJECTED'>('APPROVED');
+  const [reviewingCard, setReviewingCard] = useState<KnowledgeCardDTO | null>(
+    null,
+  );
+  const [reviewAction, setReviewAction] = useState<'APPROVED' | 'REJECTED'>(
+    'APPROVED',
+  );
   const [reviewNote, setReviewNote] = useState('');
   const [reviewCategory, setReviewCategory] = useState('');
   const [reviewEntityType, setReviewEntityType] = useState('');
@@ -77,9 +87,12 @@ export default function KnowledgeCardPage() {
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const canBatchReview = statusFilter === 'PENDING';
 
-  const reportBackgroundError = useCallback((context: string, error: unknown) => {
-    console.warn(`[KnowledgeCardPage] ${context}`, error);
-  }, []);
+  const reportBackgroundError = useCallback(
+    (context: string, error: unknown) => {
+      console.warn(`[KnowledgeCardPage] ${context}`, error);
+    },
+    [],
+  );
 
   const loadKnowledgeBases = useCallback(async () => {
     try {
@@ -150,7 +163,8 @@ export default function KnowledgeCardPage() {
     navigate(`/knowledge-cards/${val}`, { replace: true });
   };
 
-  const allSelected = canBatchReview && cards.length > 0 && selectedIds.length === cards.length;
+  const allSelected =
+    canBatchReview && cards.length > 0 && selectedIds.length === cards.length;
   const toggleSelectAll = () => {
     if (!canBatchReview) return;
     if (allSelected) {
@@ -167,7 +181,10 @@ export default function KnowledgeCardPage() {
     );
   };
 
-  const openReviewModal = (card: KnowledgeCardDTO, action: 'APPROVED' | 'REJECTED') => {
+  const openReviewModal = (
+    card: KnowledgeCardDTO,
+    action: 'APPROVED' | 'REJECTED',
+  ) => {
     setReviewingCard(card);
     setReviewAction(action);
     setReviewNote('');
@@ -248,12 +265,27 @@ export default function KnowledgeCardPage() {
 
   if (!kbId) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-        <BookOutlined style={{ fontSize: 48, color: '#1677ff', marginBottom: 16 }} />
+      <div
+        style={{
+          padding: 40,
+          textAlign: 'center',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <BookOutlined
+          style={{ fontSize: 48, color: '#1677ff', marginBottom: 16 }}
+        />
         <Typography.Title level={4} style={{ marginBottom: 8 }}>
           知识卡片审核
         </Typography.Title>
-        <Typography.Text type="secondary" style={{ marginBottom: 24, maxWidth: 360 }}>
+        <Typography.Text
+          type="secondary"
+          style={{ marginBottom: 24, maxWidth: 360 }}
+        >
           选择一个知识库，查看和管理从对话中自动提取的知识卡片，支持审核通过、驳回、批量处理等操作。
         </Typography.Text>
         <Select
@@ -263,12 +295,19 @@ export default function KnowledgeCardPage() {
           onChange={handleKbChange}
           style={{ width: 280 }}
           size="large"
-          options={knowledgeBases.map((kb) => ({ label: kb.name, value: kb.id }))}
+          options={knowledgeBases.map((kb) => ({
+            label: kb.name,
+            value: kb.id,
+          }))}
           filterOption={(input, option) =>
-            (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
+            (option?.label as string)
+              ?.toLowerCase()
+              .includes(input.toLowerCase())
           }
           notFoundContent={
-            knowledgeBases.length === 0 ? <Empty description="暂无知识库，请先创建" /> : null
+            knowledgeBases.length === 0 ? (
+              <Empty description="暂无知识库，请先创建" />
+            ) : null
           }
         />
       </div>
@@ -277,7 +316,16 @@ export default function KnowledgeCardPage() {
 
   return (
     <div style={{ padding: 24, height: '100%', overflow: 'auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 8 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+          flexWrap: 'wrap',
+          gap: 8,
+        }}
+      >
         <Space wrap>
           <Select
             showSearch
@@ -285,9 +333,14 @@ export default function KnowledgeCardPage() {
             value={selectedKbId}
             onChange={handleKbChange}
             style={{ width: 200 }}
-            options={knowledgeBases.map((kb) => ({ label: kb.name, value: kb.id }))}
+            options={knowledgeBases.map((kb) => ({
+              label: kb.name,
+              value: kb.id,
+            }))}
             filterOption={(input, option) =>
-              (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
+              (option?.label as string)
+                ?.toLowerCase()
+                .includes(input.toLowerCase())
             }
             prefix={<BookOutlined />}
           />
@@ -315,7 +368,9 @@ export default function KnowledgeCardPage() {
             ]}
           />
           {canBatchReview && selectedIds.length > 0 && (
-            <Button onClick={() => setBatchModalOpen(true)}>批量审核 ({selectedIds.length})</Button>
+            <Button onClick={() => setBatchModalOpen(true)}>
+              批量审核 ({selectedIds.length})
+            </Button>
           )}
         </Space>
       </div>
@@ -342,10 +397,17 @@ export default function KnowledgeCardPage() {
                 title={
                   <Space wrap>
                     {canBatchReview && (
-                      <Checkbox checked={selectedIds.includes(card.id)} onChange={() => toggleSelect(card.id)} />
+                      <Checkbox
+                        checked={selectedIds.includes(card.id)}
+                        onChange={() => toggleSelect(card.id)}
+                      />
                     )}
-                    <Tag color={STATUS_MAP[card.status]?.color}>{STATUS_MAP[card.status]?.label || card.status}</Tag>
-                    <Tag color={CATEGORY_MAP[card.category]?.color}>{CATEGORY_MAP[card.category]?.label || card.category}</Tag>
+                    <Tag color={STATUS_MAP[card.status]?.color}>
+                      {STATUS_MAP[card.status]?.label || card.status}
+                    </Tag>
+                    <Tag color={CATEGORY_MAP[card.category]?.color}>
+                      {CATEGORY_MAP[card.category]?.label || card.category}
+                    </Tag>
                     <Text strong>{card.title}</Text>
                   </Space>
                 }
@@ -353,23 +415,42 @@ export default function KnowledgeCardPage() {
                   <Space>
                     {card.status === 'PENDING' && (
                       <>
-                        <Button size="small" type="primary" icon={<CheckOutlined />} onClick={() => openReviewModal(card, 'APPROVED')}>
+                        <Button
+                          size="small"
+                          type="primary"
+                          icon={<CheckOutlined />}
+                          onClick={() => openReviewModal(card, 'APPROVED')}
+                        >
                           通过
                         </Button>
-                        <Button size="small" danger icon={<CloseOutlined />} onClick={() => openReviewModal(card, 'REJECTED')}>
+                        <Button
+                          size="small"
+                          danger
+                          icon={<CloseOutlined />}
+                          onClick={() => openReviewModal(card, 'REJECTED')}
+                        >
                           驳回
                         </Button>
                       </>
                     )}
-                    <Button size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(card.id)}>
+                    <Button
+                      size="small"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDelete(card.id)}
+                    >
                       删除
                     </Button>
                   </Space>
                 }
               >
                 <Space direction="vertical" size={8} style={{ width: '100%' }}>
-                  <Paragraph style={{ marginBottom: 0 }}>{card.content}</Paragraph>
-                  {card.summary && <Text type="secondary">摘要：{card.summary}</Text>}
+                  <Paragraph style={{ marginBottom: 0 }}>
+                    {card.content}
+                  </Paragraph>
+                  {card.summary && (
+                    <Text type="secondary">摘要：{card.summary}</Text>
+                  )}
                   <Space wrap size={[4, 4]}>
                     {card.tags?.map((tag) => (
                       <Tag key={tag}>{tag}</Tag>
@@ -449,10 +530,18 @@ export default function KnowledgeCardPage() {
           <Button key="cancel" onClick={() => setBatchModalOpen(false)}>
             取消
           </Button>,
-          <Button key="reject" danger onClick={() => submitBatchReview('REJECTED')}>
+          <Button
+            key="reject"
+            danger
+            onClick={() => submitBatchReview('REJECTED')}
+          >
             批量驳回
           </Button>,
-          <Button key="approve" type="primary" onClick={() => submitBatchReview('APPROVED')}>
+          <Button
+            key="approve"
+            type="primary"
+            onClick={() => submitBatchReview('APPROVED')}
+          >
             批量通过
           </Button>,
         ]}

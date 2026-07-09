@@ -51,27 +51,58 @@ export async function getGraph(kbId: string): Promise<ApiResponse<GraphData>> {
   return response.data;
 }
 
-export async function expandQuery(kbId: string, query: string): Promise<ApiResponse<string[]>> {
-  const response = await request.get<ApiResponse<string[]>>(`/graph/${kbId}/expand`, { params: { query } });
+export async function expandQuery(
+  kbId: string,
+  query: string,
+): Promise<ApiResponse<string[]>> {
+  const response = await request.get<ApiResponse<string[]>>(
+    `/graph/${kbId}/expand`,
+    { params: { query } },
+  );
   return response.data;
 }
 
-export async function getEntities(kbId: string, page: number = 0, size: number = 20): Promise<ApiResponse<PageResult<GraphNode>>> {
-  const response = await request.get<ApiResponse<PageResult<GraphNode>>>('/graph/entities', { params: { kbId, page, size } });
+export async function getEntities(
+  kbId: string,
+  page: number = 0,
+  size: number = 20,
+): Promise<ApiResponse<PageResult<GraphNode>>> {
+  const response = await request.get<ApiResponse<PageResult<GraphNode>>>(
+    '/graph/entities',
+    { params: { kbId, page, size } },
+  );
   return response.data;
 }
 
-export async function getEntityDetail(name: string, kbId: string): Promise<ApiResponse<EntityDetail>> {
-  const response = await request.get<ApiResponse<EntityDetail>>(`/graph/entities/${encodeURIComponent(name)}`, { params: { kbId } });
+export async function getEntityDetail(
+  name: string,
+  kbId: string,
+): Promise<ApiResponse<EntityDetail>> {
+  const response = await request.get<ApiResponse<EntityDetail>>(
+    `/graph/entities/${encodeURIComponent(name)}`,
+    { params: { kbId } },
+  );
   return response.data;
 }
 
-export async function getSubgraph(kbId: string, entityName: string): Promise<ApiResponse<GraphData>> {
-  const response = await request.get<ApiResponse<GraphData>>('/graph/subgraph', { params: { kbId, entityName } });
+export async function getSubgraph(
+  kbId: string,
+  entityName: string,
+): Promise<ApiResponse<GraphData>> {
+  const response = await request.get<ApiResponse<GraphData>>(
+    '/graph/subgraph',
+    { params: { kbId, entityName } },
+  );
   return response.data;
 }
 
-export async function searchGraph(kbId: string, keyword: string): Promise<ApiResponse<GraphNode[]>> {
-  const response = await request.get<ApiResponse<GraphNode[]>>('/graph/search', { params: { kbId, keyword } });
+export async function searchGraph(
+  kbId: string,
+  keyword: string,
+): Promise<ApiResponse<GraphNode[]>> {
+  const response = await request.get<ApiResponse<GraphNode[]>>(
+    '/graph/search',
+    { params: { kbId, keyword } },
+  );
   return response.data;
 }

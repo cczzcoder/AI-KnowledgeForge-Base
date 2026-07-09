@@ -1,11 +1,29 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Card, Button, Table, Upload, Space, Popconfirm, App, Typography, Tag, Drawer, List, Spin, Progress,
+  Card,
+  Button,
+  Table,
+  Upload,
+  Space,
+  Popconfirm,
+  App,
+  Typography,
+  Tag,
+  Drawer,
+  List,
+  Spin,
+  Progress,
 } from 'antd';
 import {
-  UploadOutlined, DeleteOutlined, ArrowLeftOutlined, ReloadOutlined, DownloadOutlined,
-  RedoOutlined, EyeOutlined, NodeIndexOutlined,
+  UploadOutlined,
+  DeleteOutlined,
+  ArrowLeftOutlined,
+  ReloadOutlined,
+  DownloadOutlined,
+  RedoOutlined,
+  EyeOutlined,
+  NodeIndexOutlined,
 } from '@ant-design/icons';
 import { documentController } from '@/services';
 import type { DocumentDTO, DocumentChunkDTO } from '@/services/typings.d';
@@ -32,7 +50,11 @@ function DocumentPage() {
     if (!knowledgeBaseId) return;
     setLoading(true);
     try {
-      const res = await documentController.listDocuments(knowledgeBaseId, 0, 50);
+      const res = await documentController.listDocuments(
+        knowledgeBaseId,
+        0,
+        50,
+      );
       if (mountedRef.current) {
         setDocuments(res.data.data.items);
       }
@@ -57,7 +79,9 @@ function DocumentPage() {
 
   // 当有文档正在处理时，每3秒自动刷新状态
   useEffect(() => {
-    const hasProcessing = documents.some((d) => d.status === 'PROCESSING' || d.status === 'PENDING');
+    const hasProcessing = documents.some(
+      (d) => d.status === 'PROCESSING' || d.status === 'PENDING',
+    );
     if (!hasProcessing) return;
     const timer = setInterval(() => {
       if (mountedRef.current) loadDocuments();
@@ -193,7 +217,11 @@ function DocumentPage() {
             </Tag>
           );
         }
-        return <Tag color={statusColorMap[status] || 'default'}>{statusLabelMap[status] || status}</Tag>;
+        return (
+          <Tag color={statusColorMap[status] || 'default'}>
+            {statusLabelMap[status] || status}
+          </Tag>
+        );
       },
     },
     {
@@ -201,7 +229,8 @@ function DocumentPage() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
-      render: (text: string) => (text ? new Date(text).toLocaleString('zh-CN') : '-'),
+      render: (text: string) =>
+        text ? new Date(text).toLocaleString('zh-CN') : '-',
     },
     {
       title: '操作',
@@ -252,14 +281,20 @@ function DocumentPage() {
               icon={<ArrowLeftOutlined />}
               onClick={() => navigate('/knowledge-base')}
             />
-            <Title level={3} style={{ margin: 0 }}>文档管理</Title>
+            <Title level={3} style={{ margin: 0 }}>
+              文档管理
+            </Title>
           </Space>
           <Paragraph type="secondary" style={{ margin: '4px 0 0 48px' }}>
             知识库ID: {knowledgeBaseId}
           </Paragraph>
         </div>
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={loadDocuments} loading={loading}>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={loadDocuments}
+            loading={loading}
+          >
             刷新
           </Button>
           <Button
@@ -276,7 +311,11 @@ function DocumentPage() {
             showUploadList={false}
             accept=".txt,.md,.markdown,.pdf,.doc,.docx"
           >
-            <Button type="primary" icon={<UploadOutlined />} loading={uploading && uploadProgress === 0}>
+            <Button
+              type="primary"
+              icon={<UploadOutlined />}
+              loading={uploading && uploadProgress === 0}
+            >
               上传文档
             </Button>
           </Upload>
@@ -285,7 +324,11 @@ function DocumentPage() {
 
       {uploading && uploadProgress > 0 && (
         <div style={{ marginBottom: 16 }}>
-          <Progress percent={uploadProgress} status="active" strokeColor="#1677ff" />
+          <Progress
+            percent={uploadProgress}
+            status="active"
+            strokeColor="#1677ff"
+          />
         </div>
       )}
 
@@ -318,13 +361,22 @@ function DocumentPage() {
             renderItem={(item, index) => (
               <List.Item>
                 <div style={{ width: '100%' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: 8,
+                    }}
+                  >
                     <Tag color="blue">分块 #{index + 1}</Tag>
                     <Space size="small">
                       <Text type="secondary" style={{ fontSize: 12 }}>
                         {item.tokenCount} tokens
                       </Text>
-                      <Tag color={item.embeddingReady ? 'success' : 'warning'} style={{ fontSize: 11 }}>
+                      <Tag
+                        color={item.embeddingReady ? 'success' : 'warning'}
+                        style={{ fontSize: 11 }}
+                      >
                         {item.embeddingReady ? '已向量化' : '未向量化'}
                       </Tag>
                     </Space>
