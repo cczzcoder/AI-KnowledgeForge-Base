@@ -18,7 +18,7 @@ function KnowledgeForm({ open, title, initialValues, onOk, onCancel }: Knowledge
       onOk(values);
       form.resetFields();
     } catch {
-      // validation failed
+      // 表单校验失败时由 Ant Design 在字段处展示错误，这里无需额外处理。
     }
   };
 

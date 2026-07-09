@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Spin, Empty, Card, Tag, Typography, Space, Select, List, Progress, Alert, Button, Steps, message, Divider, Collapse } from 'antd';
-import { ArrowLeftOutlined, ReloadOutlined, SearchOutlined, BulbOutlined, CompassOutlined, RocketOutlined, BookOutlined, CheckCircleOutlined, AimOutlined, TrophyOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ReloadOutlined, SearchOutlined, BulbOutlined, CompassOutlined, RocketOutlined, CheckCircleOutlined, AimOutlined, TrophyOutlined } from '@ant-design/icons';
 import { listAllKnowledgeBases } from '@/services/knowledgeBaseController';
 import { getKnowledgeGaps, getRecommendations, getLearningPath, type KnowledgeGap, type Recommendation, type LearningPath } from '@/services/discoveryController';
 import './index.css';
@@ -22,14 +22,18 @@ function DiscoveryPage() {
   const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
   const [learningPathTopic, setLearningPathTopic] = useState('');
 
+  const reportBackgroundError = useCallback((context: string, error: unknown) => {
+    console.warn(`[DiscoveryPage] ${context}`, error);
+  }, []);
+
   const loadKnowledgeBases = useCallback(async () => {
     try {
       const res = await listAllKnowledgeBases();
       setKbs(res.data.data || []);
-    } catch {
-      // silent
+    } catch (error) {
+      reportBackgroundError('加载知识库列表失败', error);
     }
-  }, []);
+  }, [reportBackgroundError]);
 
   const loadGaps = useCallback(async () => {
     const kbId = selectedKbId || knowledgeBaseId;
@@ -37,7 +41,7 @@ function DiscoveryPage() {
     setLoading(true);
     try {
       const res = await getKnowledgeGaps(kbId);
-      setGaps(res.data.data || []);
+      setGaps(res.data || []);
     } catch {
       message.error('获取知识盲区失败');
     } finally {
@@ -51,7 +55,7 @@ function DiscoveryPage() {
     setLoading(true);
     try {
       const res = await getRecommendations(kbId);
-      setRecommendations(res.data.data || []);
+      setRecommendations(res.data || []);
     } catch {
       message.error('获取推荐失败');
     } finally {
@@ -66,7 +70,7 @@ function DiscoveryPage() {
     setLoading(true);
     try {
       const res = await getLearningPath(kbId, topic);
-      setLearningPath(res.data.data || null);
+      setLearningPath(res.data || null);
     } catch {
       message.error('获取学习路径失败');
     } finally {
@@ -272,167 +276,63 @@ function DiscoveryPage() {
 
             {activeTab === 'learning' && (
               <div className="learning-section">
-                <Alert
-                  message="学习路径"
-                  description="基于知识图谱分析，为指定主题生成结构化的学习路径，包含核心知识点、推荐资源和预期成果"
-                  type="info"
-                  showIcon
-                  style={{ marginBottom: 24 }}
-                />
                 {!learningPath ? (
-                  <Empty description="点击知识盲区或推荐中的「查看学习路径」按钮来生成学习路径">
-                    <div style={{ marginTop: 16 }}>
-                      <Text type="secondary">输入主题关键词:</Text>
-                      <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center' }}>
-                        <Select
-                          showSearch
-                          style={{ width: 300 }}
-                          placeholder="选择或输入主题"
-                          value={learningPathTopic || undefined}
-                          onChange={(val) => setLearningPathTopic(val)}
-                          options={(() => {
-                            const seen = new Set<string>();
-                            return [...gaps.map((g) => ({ label: g.topic, value: g.topic })), ...recommendations.map((r) => ({ label: r.topic, value: r.topic }))]
-                              .filter((opt) => {
-                                if (seen.has(opt.value)) return false;
-                                seen.add(opt.value);
-                                return true;
-                              });
-                          })()}
-                        />
-                        <Button
-                          type="primary"
-                          onClick={() => loadLearningPath(learningPathTopic)}
-                          disabled={!learningPathTopic}
-                        >
-                          生成路径
-                        </Button>
-                      </div>
-                    </div>
-                  </Empty>
+                  <Empty description="请从知识盲区或智能推荐中选择一个主题查看学习路径" />
                 ) : (
-                  <div>
-                    <Title level={5} style={{ marginBottom: 8 }}>
-                      <BookOutlined /> 主题: {learningPath.topic}
-                    </Title>
-                    {learningPath.summary && (
-                      <Alert
-                        message="路径概览"
-                        description={learningPath.summary}
-                        type="success"
-                        showIcon
-                        style={{ marginBottom: 24 }}
-                      />
-                    )}
-                    <Steps
-                      direction="vertical"
-                      current={-1}
-                      items={learningPath.steps.map((step) => ({
-                        title: step.title,
-                        description: (
-                          <div style={{ marginTop: 8 }}>
-                            <Text>{step.description}</Text>
-                            <br />
-                            <Tag
-                              style={{ marginTop: 4 }}
-                              color={
-                                step.status === '已覆盖' ? 'success'
-                                  : step.status === '可探索' || step.status === '可实践' ? 'processing'
-                                  : 'default'
-                              }
-                            >
-                              {step.status}
-                            </Tag>
-                            {step.knowledgePoints && step.knowledgePoints.length > 0 && (
-                              <div style={{ marginTop: 8 }}>
-                                <Text type="secondary" strong>📚 核心知识点：</Text>
-                                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                  {step.knowledgePoints.filter(Boolean).map((kp, i) => (
-                                    <li key={`${step.title}-kp-${i}`}><Text type="secondary">{kp}</Text></li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {step.recommendedResources && step.recommendedResources.length > 0 && (
-                              <div style={{ marginTop: 4 }}>
-                                <Text type="secondary" strong>🔗 推荐资源：</Text>
-                                <Space wrap size={[4, 4]} style={{ marginLeft: 4 }}>
-                                  {step.recommendedResources.filter(Boolean).map((res, i) => (
-                                    <Tag key={`${step.title}-rec-${i}`} color="blue">{res}</Tag>
-                                  ))}
-                                </Space>
-                              </div>
-                            )}
-                            {step.expectedOutcomes && step.expectedOutcomes.length > 0 && (
-                              <div style={{ marginTop: 4 }}>
-                                <Text type="secondary" strong>🎯 预期成果：</Text>
-                                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                  {step.expectedOutcomes.filter(Boolean).map((outcome, i) => (
-                                    <li key={`${step.title}-out-${i}`}><Text type="secondary">{outcome}</Text></li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
-                        ),
-                      }))}
+                  <>
+                    <Alert
+                      message={`学习路径：${learningPathTopic}`}
+                      description={learningPath.description || learningPath.summary}
+                      type="success"
+                      showIcon
+                      style={{ marginBottom: 24 }}
                     />
-
-                    {learningPath.example && (
-                      <>
-                        <Divider />
-                        <div style={{ marginTop: 24 }}>
-                          <Title level={5}>
-                            <TrophyOutlined /> 学习路径示例
-                          </Title>
-                          <Alert
-                            message={learningPath.example.topic}
-                            description={
-                              <Space direction="vertical" size={4}>
-                                <Text strong>总体目标：</Text>
-                                <Text>{learningPath.example.overallGoal}</Text>
-                              </Space>
-                            }
-                            type="warning"
-                            showIcon
-                            style={{ marginBottom: 16 }}
-                          />
-                          <Collapse
-                            items={learningPath.example.exampleSteps.map((exStep) => ({
-                              key: exStep.stage.toString(),
-                              label: (
-                                <Space>
-                                  <Tag color="volcano">阶段 {exStep.stage}</Tag>
-                                  <Text strong>{exStep.stageName}</Text>
-                                  <Tag color="blue">{exStep.duration}</Tag>
-                                </Space>
-                              ),
-                              children: (
-                                <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                                  <div>
-                                    <Text strong><AimOutlined /> 目标：</Text>
-                                    <Text>{exStep.objective}</Text>
-                                  </div>
-                                  <div>
-                                    <Text strong><BookOutlined /> 核心内容：</Text>
-                                    <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                      {exStep.coreContents.map((c, i) => (
-                                        <li key={`${exStep.stageName}-core-${i}`}><Text>{c}</Text></li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                  <div>
-                                    <Text strong><CheckCircleOutlined /> 成果：</Text>
-                                    <Tag color="green">{exStep.outcome}</Tag>
-                                  </div>
-                                </Space>
-                              ),
-                            }))}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
+                    <Card>
+                      <Steps
+                        direction="vertical"
+                        items={learningPath.steps.map((step, index) => ({
+                          title: (
+                            <Space>
+                              <span>{step.title}</span>
+                              <Tag color="processing">第 {index + 1} 步</Tag>
+                            </Space>
+                          ),
+                          description: (
+                            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                              <Text type="secondary">{step.description}</Text>
+                              {(step.resources || step.recommendedResources).length > 0 && (
+                                <div>
+                                  <Text strong>推荐资源：</Text>
+                                  <Space wrap size={[4, 4]} style={{ marginTop: 4 }}>
+                                    {(step.resources || step.recommendedResources).map((res, i) => (
+                                      <Tag key={`${step.title}-resource-${i}`} color="purple">{res}</Tag>
+                                    ))}
+                                  </Space>
+                                </div>
+                              )}
+                            </Space>
+                          ),
+                          icon: index === 0 ? <AimOutlined /> : index === learningPath.steps.length - 1 ? <TrophyOutlined /> : <CheckCircleOutlined />,
+                        }))}
+                      />
+                    </Card>
+                    <Divider />
+                    <Collapse
+                      items={[
+                        {
+                          key: 'tips',
+                          label: '学习建议',
+                          children: (
+                            <Space direction="vertical" size={8}>
+                              <Text>• 按步骤顺序逐步学习，避免跳跃式理解</Text>
+                              <Text>• 结合当前知识库中的已有内容，优先补足缺失部分</Text>
+                              <Text>• 学习完成后可回到知识盲区分析查看覆盖度变化</Text>
+                            </Space>
+                          ),
+                        },
+                      ]}
+                    />
+                  </>
                 )}
               </div>
             )}

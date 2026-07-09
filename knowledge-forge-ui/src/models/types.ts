@@ -1,6 +1,8 @@
+import type { AuthVO } from '@/services/authController';
+
 export type ThemeType = 'dark' | 'light';
 
 export interface GlobalType {
-  authVO?: API.AuthVO;
+  authVO?: AuthVO;
   theme?: ThemeType;
 }

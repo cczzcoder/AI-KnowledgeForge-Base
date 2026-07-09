@@ -10,6 +10,9 @@ export interface KnowledgeCardDTO {
   messageId?: string;
   title: string;
   content: string;
+  summary?: string;
+  tags?: string[];
+  knowledgeBaseName?: string;
   category: 'CONCEPT' | 'FACT' | 'RULE' | 'INSIGHT';
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   entityType?: string;

@@ -36,7 +36,10 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
   const mountedRef = useRef(true);
   const abortRef = useRef<AbortController | null>(null);
 
-  // 组件卸载时取消进行中的 SSE 请求
+  const reportBackgroundError = useCallback((context: string, error: unknown) => {
+    console.warn(`[ChatPage] ${context}`, error);
+  }, []);
+
   useEffect(() => {
     return () => {
       abortRef.current?.abort();
@@ -49,10 +52,10 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
       if (mountedRef.current) {
         setConversations(res.data.data.items);
       }
-    } catch {
-      // silent
+    } catch (error) {
+      reportBackgroundError('加载对话列表失败', error);
     }
-  }, []);
+  }, [reportBackgroundError]);
 
   const loadKnowledgeBases = useCallback(async () => {
     try {
@@ -60,10 +63,10 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
       if (mountedRef.current) {
         setKnowledgeBases(res.data.data);
       }
-    } catch {
-      // silent
+    } catch (error) {
+      reportBackgroundError('加载知识库列表失败', error);
     }
-  }, []);
+  }, [reportBackgroundError]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -121,7 +124,6 @@ function ChatPage({ themeMode, sidebarCollapsed, onToggleSidebar }: ChatPageProp
 
     let fullContent = '';
 
-    // 取消前一个进行中的 SSE 请求
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;

@@ -57,7 +57,7 @@ AI-Knowledge-Base是一款面向个人知识管理的 RAG 问答系统。用户�
 
 | 技术          | 版本            | 用途          |
 | ----------- | ------------- | ----------- |
-| Java        | 17            | 开发语言        |
+| Java        | 21            | 开发语言        |
 | Spring Boot | 3.4.x         | 应用框架        |
 | Spring AI   | 1.0.0 (GA)    | AI 集成框架     |
 | PostgreSQL  | 16 + pgvector | 业务数据 + 向量存储 |
@@ -95,12 +95,11 @@ knowledge-forge/
 │   ├── src/pages/Document/      # 文档管理
 │   ├── src/pages/Graph/         # 知识图谱可视化
 │   ├── src/pages/Discovery/     # 知识发现
-│   ├── src/pages/KnowledgeCards/# 知识卡片审核
+│   ├── src/pages/KnowledgeCard/ # 知识卡片审核
 │   └── src/services/            # API 服务层
 ├── knowledge-forge-bom/         # BOM 统一依赖管理
 ├── doc/                         # 项目文档
-│   ├── KnowledgeForge-AI-设计文档.md   # 系统设计文档
-│   └── knowledge-card-test-report.md  # 知识卡片测试报告
+│   └── KnowledgeForge-AI-设计文档.md  # 系统设计文档
 ├── env/                         # 环境配置
 │   └── docker-compose.yml       # Docker 容器编排
 └── pom.xml                      # 根 Maven 配置
@@ -110,7 +109,7 @@ knowledge-forge/
 
 ### 环境要求
 
-- JDK 17+
+- JDK 21
 - Node.js 18+
 - Docker（用于 PostgreSQL + MinIO）
 - Maven 3.9+
@@ -122,41 +121,42 @@ cd env
 docker-compose up -d
 ```
 
-### 2. 配置 LLM 密钥
+### 2. 配置 LLM 与本地环境变量
 
 ```bash
 # 复制配置模板
 cp knowledge-forge-system/src/main/resources/llm.yml.example \
    knowledge-forge-system/src/main/resources/llm.yml
-
-# 编辑 llm.yml 填入 API Key，或通过环境变量设置：
-# Windows PowerShell
-$env:AI_API_KEY="your-api-key"
-# Linux / macOS
-export AI_API_KEY="your-api-key"
 ```
 
-### 3. 配置数据库密码
+`application.yml` 会加载可选的 `llm.yml`，其中 AI 配置通过环境变量读取；数据库与 MinIO 也通过环境变量注入：
+
+- 必填：`PG_PASSWORD`、`MINIO_ACCESS_KEY`、`MINIO_SECRET_KEY`、`AI_API_KEY`
+- 可选默认值：`AI_BASE_URL`、`AI_CHAT_MODEL`、`AI_EMBEDDING_MODEL`
+- 推荐直接复制仓库根目录下的 `.env.example` 为本地 `.env`，再按实际环境填写
 
 ```bash
 # Windows PowerShell
-$env:PG_PASSWORD="your-db-password"
-$env:MINIO_ACCESS_KEY="minioadmin"
-$env:MINIO_SECRET_KEY="minioadmin"
+$env:PG_PASSWORD="<your-db-password>"
+$env:MINIO_ACCESS_KEY="<your-minio-access-key>"
+$env:MINIO_SECRET_KEY="<your-minio-secret-key>"
+$env:AI_API_KEY="<your-ai-api-key>"
+
 # Linux / macOS
-export PG_PASSWORD="your-db-password"
-export MINIO_ACCESS_KEY="minioadmin"
-export MINIO_SECRET_KEY="minioadmin"
+export PG_PASSWORD="<your-db-password>"
+export MINIO_ACCESS_KEY="<your-minio-access-key>"
+export MINIO_SECRET_KEY="<your-minio-secret-key>"
+export AI_API_KEY="<your-ai-api-key>"
 ```
 
-### 4. 启动后端
+### 3. 启动后端
 
 ```bash
 cd knowledge-forge-system
 mvn spring-boot:run
 ```
 
-### 5. 启动前端
+### 4. 启动前端
 
 ```bash
 cd knowledge-forge-ui
@@ -248,9 +248,13 @@ npm run dev
 
 ## 验证
 
-- **后端编译**：`mvn compile`（已验证通过）
-- **前端编译**：`npx tsc --noEmit`（已验证通过）
-- **单元测试**：30/30 全部通过
+建议以以下命令作为本地与 CI 的统一校验入口：
+
+- **后端编译与测试**：`mvn test`
+- **前端 Lint**：`npm run lint`
+- **前端类型检查**：`npm run typecheck`
+- **前端构建**：`npm run build`
+- **前端格式检查**：`npm run format:check`
 
 ## License
 

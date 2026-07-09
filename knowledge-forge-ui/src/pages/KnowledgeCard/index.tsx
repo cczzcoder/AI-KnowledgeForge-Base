@@ -52,7 +52,6 @@ export default function KnowledgeCardPage() {
   const { knowledgeBaseId: paramKbId } = useParams<{ knowledgeBaseId?: string }>();
   const navigate = useNavigate();
 
-  // 知识库列表与选中
   const [knowledgeBases, setKnowledgeBases] = useState<{ id: string; name: string }[]>([]);
   const [selectedKbId, setSelectedKbId] = useState<string | undefined>(paramKbId);
   const kbId = selectedKbId || '';
@@ -65,10 +64,8 @@ export default function KnowledgeCardPage() {
   const [loading, setLoading] = useState(false);
   const [pendingNum, setPendingNum] = useState(0);
 
-  // 选中状态
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // 审核弹窗
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewingCard, setReviewingCard] = useState<KnowledgeCardDTO | null>(null);
   const [reviewAction, setReviewAction] = useState<'APPROVED' | 'REJECTED'>('APPROVED');
@@ -76,26 +73,27 @@ export default function KnowledgeCardPage() {
   const [reviewCategory, setReviewCategory] = useState('');
   const [reviewEntityType, setReviewEntityType] = useState('');
 
-  // 批量审核弹窗
   const [batchModalOpen, setBatchModalOpen] = useState(false);
 
-  // 加载知识库列表
+  const reportBackgroundError = useCallback((context: string, error: unknown) => {
+    console.warn(`[KnowledgeCardPage] ${context}`, error);
+  }, []);
+
   const loadKnowledgeBases = useCallback(async () => {
     try {
       const res = await listAllKnowledgeBases();
       const kbs = res.data?.data;
       setKnowledgeBases(Array.isArray(kbs) ? kbs : []);
-    } catch {
-      // silent
+    } catch (error) {
+      reportBackgroundError('加载知识库列表失败', error);
     }
-  }, []);
+  }, [reportBackgroundError]);
 
-  // 同步URL参数到选中状态
   useEffect(() => {
     if (paramKbId && paramKbId !== selectedKbId) {
       setSelectedKbId(paramKbId);
     }
-  }, [paramKbId]);
+  }, [paramKbId, selectedKbId]);
 
   const loadCards = useCallback(async () => {
     if (!kbId) return;
@@ -125,10 +123,10 @@ export default function KnowledgeCardPage() {
       if (res.code === 200 && res.data) {
         setPendingNum(res.data.count);
       }
-    } catch {
-      // ignore
+    } catch (error) {
+      reportBackgroundError('加载待审核数量失败', error);
     }
-  }, [kbId]);
+  }, [kbId, reportBackgroundError]);
 
   useEffect(() => {
     loadKnowledgeBases();
@@ -139,7 +137,6 @@ export default function KnowledgeCardPage() {
     loadPendingCount();
   }, [loadCards, loadPendingCount]);
 
-  // 切换知识库
   const handleKbChange = (val: string) => {
     setSelectedKbId(val);
     setPage(0);
@@ -147,7 +144,6 @@ export default function KnowledgeCardPage() {
     navigate(`/knowledge-cards/${val}`, { replace: true });
   };
 
-  // 全选/取消
   const allSelected = cards.length > 0 && selectedIds.length === cards.length;
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -156,13 +152,13 @@ export default function KnowledgeCardPage() {
       setSelectedIds(cards.map((c) => c.id));
     }
   };
+
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
-  // 打开审核弹窗
   const openReviewModal = (card: KnowledgeCardDTO, action: 'APPROVED' | 'REJECTED') => {
     setReviewingCard(card);
     setReviewAction(action);
@@ -172,7 +168,6 @@ export default function KnowledgeCardPage() {
     setReviewModalOpen(true);
   };
 
-  // 提交审核
   const submitReview = async () => {
     if (!reviewingCard) return;
     try {
@@ -194,7 +189,6 @@ export default function KnowledgeCardPage() {
     }
   };
 
-  // 批量审核
   const submitBatchReview = async (action: 'APPROVED' | 'REJECTED') => {
     if (selectedIds.length === 0) {
       message.warning('请先选择卡片');
@@ -218,7 +212,6 @@ export default function KnowledgeCardPage() {
     }
   };
 
-  // 删除卡片
   const handleDelete = (cardId: string) => {
     Modal.confirm({
       title: '确认删除',
@@ -272,7 +265,6 @@ export default function KnowledgeCardPage() {
 
   return (
     <div style={{ padding: 24, height: '100%', overflow: 'auto' }}>
-      {/* 页头 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 8 }}>
         <Space wrap>
           <Select
@@ -316,199 +308,111 @@ export default function KnowledgeCardPage() {
         </Space>
       </div>
 
-      {/* 卡片列表 */}
       <Spin spinning={loading}>
-        {cards.length === 0 ? (
-          <Empty description="暂无知识卡片" style={{ marginTop: 80 }} />
-        ) : (
-          <>
-            {/* 全选栏 */}
-            {statusFilter === 'PENDING' && (
-              <Checkbox
-                checked={allSelected}
-                indeterminate={selectedIds.length > 0 && !allSelected}
-                onChange={toggleSelectAll}
-                style={{ marginBottom: 12 }}
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <Space>
+            <Checkbox checked={allSelected} onChange={toggleSelectAll}>
+              全选当前页
+            </Checkbox>
+            <Text type="secondary">共 {total} 张卡片</Text>
+          </Space>
+
+          {cards.length === 0 ? (
+            <Empty description="暂无知识卡片" />
+          ) : (
+            cards.map((card) => (
+              <Card
+                key={card.id}
+                size="small"
+                style={{ width: '100%' }}
+                title={
+                  <Space wrap>
+                    <Checkbox checked={selectedIds.includes(card.id)} onChange={() => toggleSelect(card.id)} />
+                    <Tag color={STATUS_MAP[card.status]?.color}>{STATUS_MAP[card.status]?.label || card.status}</Tag>
+                    <Tag color={CATEGORY_MAP[card.category]?.color}>{CATEGORY_MAP[card.category]?.label || card.category}</Tag>
+                    <Text strong>{card.title}</Text>
+                  </Space>
+                }
+                extra={
+                  <Space>
+                    {card.status === 'PENDING' && (
+                      <>
+                        <Button size="small" type="primary" icon={<CheckOutlined />} onClick={() => openReviewModal(card, 'APPROVED')}>
+                          通过
+                        </Button>
+                        <Button size="small" danger icon={<CloseOutlined />} onClick={() => openReviewModal(card, 'REJECTED')}>
+                          驳回
+                        </Button>
+                      </>
+                    )}
+                    <Button size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(card.id)}>
+                      删除
+                    </Button>
+                  </Space>
+                }
               >
-                全选
-              </Checkbox>
-            )}
-
-            {/* 卡片列表 */}
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              {cards.map((card) => (
-                <Card
-                  key={card.id}
-                  size="small"
-                  title={
-                    <Space>
-                      {statusFilter === 'PENDING' && (
-                        <Checkbox
-                          checked={selectedIds.includes(card.id)}
-                          onChange={() => toggleSelect(card.id)}
-                        />
-                      )}
-                      <Text strong>{card.title}</Text>
-                      {card.category && CATEGORY_MAP[card.category] && (
-                        <Tag color={CATEGORY_MAP[card.category].color}>
-                          {CATEGORY_MAP[card.category].label}
-                        </Tag>
-                      )}
-                      {card.entityType && <Tag>{card.entityType}</Tag>}
-                    </Space>
-                  }
-                  extra={
-                    <Tag color={STATUS_MAP[card.status]?.color}>
-                      {STATUS_MAP[card.status]?.label}
-                    </Tag>
-                  }
-                  actions={
-                    card.status === 'PENDING'
-                      ? [
-                          <Button
-                            type="primary"
-                            size="small"
-                            icon={<CheckOutlined />}
-                            onClick={() => openReviewModal(card, 'APPROVED')}
-                          >
-                            通过
-                          </Button>,
-                          <Button
-                            danger
-                            size="small"
-                            icon={<CloseOutlined />}
-                            onClick={() => openReviewModal(card, 'REJECTED')}
-                          >
-                            驳回
-                          </Button>,
-                          <Button
-                            size="small"
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleDelete(card.id)}
-                          >
-                            删除
-                          </Button>,
-                        ]
-                      : [
-                          <Button
-                            size="small"
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleDelete(card.id)}
-                          >
-                            删除
-                          </Button>,
-                        ]
-                  }
-                >
-                  <Paragraph ellipsis={{ rows: 2, expandable: true, symbol: '展开' }}>
-                    {card.content}
-                  </Paragraph>
-                  {card.reviewerNote && (
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      审核备注: {card.reviewerNote}
-                    </Text>
-                  )}
-                  <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
-                    {card.createdAt && new Date(card.createdAt).toLocaleString('zh-CN')}
-                    {card.vectorized && <Tag color="green" style={{ marginLeft: 8 }}>已向量化</Tag>}
-                  </div>
-                </Card>
-              ))}
-            </Space>
-
-            {/* 分页 */}
-            {total > pageSize && (
-              <div style={{ textAlign: 'center', marginTop: 20 }}>
-                <Button
-                  disabled={page === 0}
-                  onClick={() => setPage((p) => p - 1)}
-                  style={{ marginRight: 8 }}
-                >
-                  上一页
-                </Button>
-                <Text>
-                  第 {page + 1} / {Math.ceil(total / pageSize)} 页，共 {total} 条
-                </Text>
-                <Button
-                  disabled={(page + 1) * pageSize >= total}
-                  onClick={() => setPage((p) => p + 1)}
-                  style={{ marginLeft: 8 }}
-                >
-                  下一页
-                </Button>
-              </div>
-            )}
-          </>
-        )}
+                <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                  <Paragraph style={{ marginBottom: 0 }}>{card.content}</Paragraph>
+                  {card.summary && <Text type="secondary">摘要：{card.summary}</Text>}
+                  <Space wrap size={[4, 4]}>
+                    {card.tags?.map((tag) => (
+                      <Tag key={tag}>{tag}</Tag>
+                    ))}
+                  </Space>
+                  <Text type="secondary">
+                    来源知识库：{card.knowledgeBaseName || '-'}
+                    {card.entityType ? ` · 实体类型：${card.entityType}` : ''}
+                  </Text>
+                </Space>
+              </Card>
+            ))
+          )}
+        </Space>
       </Spin>
 
-      {/* 审核弹窗 */}
       <Modal
-        title={`${reviewAction === 'APPROVED' ? '通过' : '驳回'}知识卡片`}
+        title={reviewAction === 'APPROVED' ? '审核通过' : '审核驳回'}
         open={reviewModalOpen}
         onOk={submitReview}
         onCancel={() => setReviewModalOpen(false)}
-        okText={reviewAction === 'APPROVED' ? '确认通过' : '确认驳回'}
-        okType={reviewAction === 'APPROVED' ? 'primary' : 'danger'}
-        width={560}
+        okText="提交"
+        cancelText="取消"
       >
-        <div style={{ marginBottom: 16 }}>
-          <Text strong>标题: </Text>
-          <Text>{reviewingCard?.title}</Text>
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <Text strong>内容: </Text>
-          <Paragraph style={{ background: '#fafafa', padding: 12, borderRadius: 6, marginTop: 4 }}>
-            {reviewingCard?.content}
-          </Paragraph>
-        </div>
-        <Space direction="vertical" style={{ width: '100%' }}>
+        <Space direction="vertical" size={12} style={{ width: '100%' }}>
           <div>
-            <Text strong>分类: </Text>
+            <Text strong>分类</Text>
             <Select
               value={reviewCategory}
               onChange={setReviewCategory}
-              style={{ width: 200, marginLeft: 8 }}
-              options={[
-                { value: 'CONCEPT', label: '概念' },
-                { value: 'FACT', label: '事实' },
-                { value: 'RULE', label: '规则' },
-                { value: 'INSIGHT', label: '见解' },
-              ]}
+              style={{ width: '100%', marginTop: 8 }}
+              options={Object.entries(CATEGORY_MAP).map(([value, meta]) => ({
+                value,
+                label: meta.label,
+              }))}
             />
           </div>
           <div>
-            <Text strong>实体类型: </Text>
-            <Select
+            <Text strong>实体类型</Text>
+            <Input
               value={reviewEntityType}
-              onChange={setReviewEntityType}
-              style={{ width: 200, marginLeft: 8 }}
-              allowClear
-              placeholder="可选：人物/地点/概念/事件..."
-              options={[
-                { value: '人物', label: '人物' },
-                { value: '地点', label: '地点' },
-                { value: '概念', label: '概念' },
-                { value: '事件', label: '事件' },
-                { value: '作品', label: '作品' },
-                { value: '组织', label: '组织' },
-              ]}
+              onChange={(e) => setReviewEntityType(e.target.value)}
+              placeholder="可选"
+              style={{ marginTop: 8 }}
             />
           </div>
           <div>
-            <Text strong>审核备注: </Text>
+            <Text strong>审核备注</Text>
             <TextArea
               value={reviewNote}
               onChange={(e) => setReviewNote(e.target.value)}
-              placeholder="可选：填写审核意见"
-              rows={3}
-              style={{ marginTop: 4 }}
+              rows={4}
+              placeholder="可选"
+              style={{ marginTop: 8 }}
             />
           </div>
         </Space>
       </Modal>
 
-      {/* 批量审核弹窗 */}
       <Modal
         title="批量审核"
         open={batchModalOpen}
@@ -517,23 +421,15 @@ export default function KnowledgeCardPage() {
           <Button key="cancel" onClick={() => setBatchModalOpen(false)}>
             取消
           </Button>,
-          <Button
-            key="reject"
-            danger
-            onClick={() => submitBatchReview('REJECTED')}
-          >
-            全部驳回
+          <Button key="reject" danger onClick={() => submitBatchReview('REJECTED')}>
+            批量驳回
           </Button>,
-          <Button
-            key="approve"
-            type="primary"
-            onClick={() => submitBatchReview('APPROVED')}
-          >
-            全部通过
+          <Button key="approve" type="primary" onClick={() => submitBatchReview('APPROVED')}>
+            批量通过
           </Button>,
         ]}
       >
-        <p>已选择 {selectedIds.length} 张卡片，请选择批量操作：</p>
+        <Text>已选择 {selectedIds.length} 张卡片，请确认批量审核操作。</Text>
       </Modal>
     </div>
   );

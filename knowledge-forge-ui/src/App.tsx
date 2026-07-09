@@ -32,6 +32,58 @@ import './index.css';
 const { Header, Content } = Layout;
 const { darkAlgorithm, defaultAlgorithm } = theme;
 
+const MENU_ITEMS = [
+  {
+    key: '/chat',
+    icon: <RobotOutlined />,
+    label: 'AI 对话',
+  },
+  {
+    key: '/knowledge-base',
+    icon: <BookOutlined />,
+    label: '知识库',
+  },
+  {
+    key: '/discovery',
+    icon: <CompassOutlined />,
+    label: '主动发现',
+  },
+  {
+    key: '/knowledge-cards',
+    icon: <IdcardOutlined />,
+    label: '知识卡片',
+  },
+];
+
+const USER_MENU_ITEMS = [
+  {
+    key: 'profile',
+    icon: <UserOutlined />,
+    label: '个人中心',
+  },
+  {
+    key: 'settings',
+    icon: <SettingOutlined />,
+    label: '设置',
+  },
+  { type: 'divider' as const },
+  {
+    key: 'login',
+    icon: <LogoutOutlined />,
+    label: '登录 / 切换账号',
+  },
+];
+
+function getSelectedMenuKeys(pathname: string) {
+  if (pathname.startsWith('/knowledge-base/')) {
+    return ['/knowledge-base'];
+  }
+  if (pathname.startsWith('/knowledge-cards')) {
+    return ['/knowledge-cards'];
+  }
+  return [pathname];
+}
+
 interface AppLayoutProps {
   themeMode: 'light' | 'dark';
   onThemeChange: (mode: 'light' | 'dark') => void;
@@ -44,7 +96,6 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [serviceUnavailable, setServiceUnavailable] = useState(false);
 
-  // 订阅服务状态变化
   useEffect(() => {
     const unsubscribe = onServiceStatusChange((unavailable) => {
       setServiceUnavailable(unavailable);
@@ -52,66 +103,26 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
     return unsubscribe;
   }, []);
 
-  // 重试连接
   const handleRetryConnection = useCallback(() => {
     checkServiceHealth();
   }, []);
 
   const isDark = themeMode === 'dark';
   const isChatPage = location.pathname === '/chat' || location.pathname === '/';
-  const isDocumentPage = location.pathname.startsWith('/knowledge-base/');
-  const isDiscoveryPage = location.pathname.startsWith('/discovery');
-  const isKnowledgeCardPage = location.pathname.startsWith('/knowledge-cards');
   const isLoginPage = location.pathname === '/login';
-
-  const menuItems = [
-    {
-      key: '/chat',
-      icon: <RobotOutlined />,
-      label: 'AI 对话',
-    },
-    {
-      key: '/knowledge-base',
-      icon: <BookOutlined />,
-      label: '知识库',
-    },
-    {
-      key: '/discovery',
-      icon: <CompassOutlined />,
-      label: '主动发现',
-    },
-    {
-      key: '/knowledge-cards',
-      icon: <IdcardOutlined />,
-      label: '知识卡片',
-    },
-  ];
-
-  const userMenuItems = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: '个人中心',
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: '设置',
-    },
-    { type: 'divider' as const },
-    {
-      key: 'login',
-      icon: <LogoutOutlined />,
-      label: '登录 / 切换账号',
-    },
-  ];
 
   const handleUserMenuClick = ({ key }: { key: string }) => {
     if (key === 'profile') {
       message.info('个人中心功能开发中，敬请期待');
-    } else if (key === 'settings') {
+      return;
+    }
+
+    if (key === 'settings') {
       message.info('设置功能开发中，敬请期待');
-    } else if (key === 'login') {
+      return;
+    }
+
+    if (key === 'login') {
       navigate('/login');
     }
   };
@@ -187,8 +198,8 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
         </div>
         <Menu
           mode="horizontal"
-          selectedKeys={isDocumentPage ? ['/knowledge-base'] : isKnowledgeCardPage ? ['/knowledge-cards'] : [location.pathname]}
-          items={menuItems}
+          selectedKeys={getSelectedMenuKeys(location.pathname)}
+          items={MENU_ITEMS}
           onClick={({ key }) => navigate(key)}
           style={{
             flex: 1,
@@ -200,7 +211,7 @@ function AppLayout({ themeMode, onThemeChange }: AppLayoutProps) {
         />
         <div className="app-header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <ThemeSwitcher value={themeMode} onChange={onThemeChange} />
-          <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenuClick }} placement="bottomRight">
+          <Dropdown menu={{ items: USER_MENU_ITEMS, onClick: handleUserMenuClick }} placement="bottomRight">
             <Avatar
               size={32}
               icon={<UserOutlined />}
@@ -258,16 +269,7 @@ function App() {
     <ConfigProvider
       locale={zhCN}
       theme={{
-        algorithm: themeMode === 'dark' ? [darkAlgorithm] : [defaultAlgorithm],
-        token: {
-          colorPrimary: '#1677ff',
-          colorBgContainer: themeMode === 'dark' ? '#0f0f1a' : '#ffffff',
-          colorBgElevated: themeMode === 'dark' ? '#1a1a2e' : '#ffffff',
-          colorText: themeMode === 'dark' ? '#e8e8e8' : 'rgba(0, 0, 0, 0.88)',
-          colorTextSecondary: themeMode === 'dark' ? '#8b8b9e' : 'rgba(0, 0, 0, 0.65)',
-          colorBorder: themeMode === 'dark' ? '#2d2d3f' : '#f0f0f0',
-          borderRadius: 8,
-        },
+        algorithm: themeMode === 'dark' ? darkAlgorithm : defaultAlgorithm,
       }}
     >
       <AntApp>

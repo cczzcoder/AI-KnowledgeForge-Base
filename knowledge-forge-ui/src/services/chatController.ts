@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, ChatRequest, ChatResponse } from './typings.d';
+import type { ApiResponse, ChatRequest, ChatResponse, CredibilityBreakdownDTO, SourceDTO } from './typings.d';
 
 const API_BASE = '/api/v1';
 
@@ -15,7 +15,7 @@ export async function ragChatStream(
   body: ChatRequest,
   onChunk: (text: string) => void,
   signal?: AbortSignal,
-  onMetadata?: (metadata: { conversationId: string; sources: import('./typings.d').SourceDTO[] }) => void,
+  onMetadata?: (metadata: { conversationId: string; sources: SourceDTO[]; credibility?: CredibilityBreakdownDTO }) => void,
 ): Promise<void> {
   const response = await fetch(`${API_BASE}/chat/rag/stream`, {
     method: 'POST',

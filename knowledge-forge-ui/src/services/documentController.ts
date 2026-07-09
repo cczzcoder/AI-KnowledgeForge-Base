@@ -1,5 +1,5 @@
 import request from './request';
-import type { ApiResponse, DocumentDTO, PageResult } from './typings.d';
+import type { ApiResponse, DocumentDTO, DocumentChunkDTO, PageResult } from './typings.d';
 
 export async function uploadDocument(
   kbId: string,

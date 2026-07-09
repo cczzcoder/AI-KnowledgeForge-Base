@@ -1,16 +1,5 @@
-# Compiled class file
+# Java / Maven
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -18,7 +7,36 @@
 *.zip
 *.tar.gz
 *.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+*.log
+*.ctxt
+.mtj.tmp/
 hs_err_pid*
 replay_pid*
+**/target/
+**/.flattened-pom.xml
+
+# Node / frontend
+knowledge-forge-ui/node_modules/
+knowledge-forge-ui/dist/
+coverage/
+.eslintcache
+
+# Local environment files
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+knowledge-forge-system/src/main/resources/llm.yml
+
+# TypeScript build info
+knowledge-forge-ui/tsconfig.tsbuildinfo
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db

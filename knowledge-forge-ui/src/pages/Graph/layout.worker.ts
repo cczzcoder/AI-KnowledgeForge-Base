@@ -114,7 +114,7 @@ function forceLayout(
 function hierarchicalLayout(
   nodeCount: number,
   edges: { sourceIndex: number; targetIndex: number }[],
-  nodeRadiuses: number[],
+  _nodeRadiuses: number[],
 ): { x: number; y: number }[] {
   // 构建邻接表
   const adj = new Map<number, Set<number>>();
@@ -241,7 +241,7 @@ function hierarchicalLayout(
 // ---- 环形布局 ----
 function circularLayout(
   nodeCount: number,
-  nodeRadiuses: number[],
+  _nodeRadiuses: number[],
 ): { x: number; y: number }[] {
   const cx = 600, cy = 450, r = Math.min(cx, cy) - 80;
   const result: { x: number; y: number }[] = [];

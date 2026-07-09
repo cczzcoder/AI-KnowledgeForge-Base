@@ -26,6 +26,7 @@ function ChatMessageComponent({ role, content, sources, credibility, messageId }
     try {
       await chatController.submitFeedback(messageId, newFeedback || '');
     } catch {
+      setFeedback(feedback);
       message.error('反馈提交失败');
     }
   };

@@ -1,11 +1,23 @@
 import request from './request';
+import type { ApiResponse } from './typings.d';
 
-export async function login(body: API.UserLoginVO, options?: Record<string, unknown>) {
-  return request.post<API.BaseResponseAuthVO>('/auth/login', body, options);
+export interface UserLoginDTO {
+  username: string;
+  password: string;
+}
+
+export interface AuthVO {
+  username?: string;
+  token?: string;
+  roles?: string[];
+}
+
+export async function login(body: UserLoginDTO, options?: Record<string, unknown>) {
+  return request.post<ApiResponse<AuthVO>>('/auth/login', body, options);
 }
 
 export async function userInfo(options?: Record<string, unknown>) {
-  return request.get<API.BaseResponseAuthVO>('/auth/userInfo', options);
+  return request.get<ApiResponse<AuthVO>>('/auth/userInfo', options);
 }
 
 export default { login, userInfo };

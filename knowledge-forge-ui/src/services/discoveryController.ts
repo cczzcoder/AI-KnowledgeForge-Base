@@ -23,6 +23,7 @@ export interface LearningStep {
   status: string;
   knowledgePoints: string[];
   recommendedResources: string[];
+  resources: string[];
   expectedOutcomes: string[];
 }
 
@@ -44,6 +45,7 @@ export interface LearningExample {
 export interface LearningPath {
   topic: string;
   summary: string;
+  description: string;
   steps: LearningStep[];
   example: LearningExample;
 }

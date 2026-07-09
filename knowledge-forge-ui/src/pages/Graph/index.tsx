@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Spin, Empty, Card, Tag, Typography, Space, Select, Input, Drawer, Button, List, message, Divider, AutoComplete, Segmented } from 'antd';
 import { ArrowLeftOutlined, ReloadOutlined, NodeIndexOutlined, ZoomInOutlined, ZoomOutOutlined, ExpandOutlined, SearchOutlined, LinkOutlined, PartitionOutlined, ApartmentOutlined, RadarChartOutlined } from '@ant-design/icons';
-import { getGraph, getEntities, getEntityDetail, getSubgraph, searchGraph, type GraphNode, type GraphEdge, type GraphData, type EntityDetail, type RelatedEntity } from '@/services/graphController';
+import { getGraph, getEntityDetail, getSubgraph, searchGraph, type GraphNode, type GraphEdge, type GraphData, type EntityDetail, type RelatedEntity } from '@/services/graphController';
 import { listAllKnowledgeBases } from '@/services/knowledgeBaseController';
 import './index.css';
 
@@ -161,7 +161,7 @@ export default function GraphPage() {
     setLoading(true);
     try {
       const res = await getGraph(kbId);
-      const data = res.data.data;
+      const data = res.data;
       if (data) {
         setGraphData(data);
         setEdges(data.edges || []);
@@ -300,7 +300,7 @@ export default function GraphPage() {
     setSearching(true);
     try {
       const res = await searchGraph(kbId, keyword.trim());
-      setSearchResults(res.data.data || []);
+      setSearchResults(res.data || []);
     } catch { message.error('搜索失败'); }
     finally { setSearching(false); }
   }, [selectedKbId, knowledgeBaseId]);
@@ -319,7 +319,7 @@ export default function GraphPage() {
     if (!kbId) { setDetailLoading(false); return; }
     try {
       const res = await getEntityDetail(node.name, kbId);
-      setEntityDetail(res.data.data || null);
+      setEntityDetail(res.data || null);
     } catch { message.error('获取实体详情失败'); }
     finally { setDetailLoading(false); }
   }, [selectedKbId, knowledgeBaseId]);
@@ -334,7 +334,7 @@ export default function GraphPage() {
     setSubgraphCenterName(selectedEntity.name);
     try {
       const res = await getSubgraph(kbId, selectedEntity.name);
-      const data = res.data.data;
+      const data = res.data;
       if (data) {
         setGraphData(data);
         setEdges(data.edges || []);
@@ -358,7 +358,7 @@ export default function GraphPage() {
    * ================================================================ */
   const renderEdges = useMemo(() => {
     const edgeOffsetMap = new Map<string, number>();
-    for (const [key, group] of parallelEdgeGroups) {
+    for (const [, group] of parallelEdgeGroups) {
       group.forEach((e, i) => {
         const total = group.length;
         const offset = total === 1 ? 0 : (i - (total - 1) / 2) * 22;
@@ -393,8 +393,6 @@ export default function GraphPage() {
         pathD = `M ${source.x} ${source.y - r} A ${r} ${r} 0 1 1 ${source.x + r} ${source.y}`;
       } else {
         // 三次贝塞尔曲线，垂线偏移
-        const cx = midX + nx * offset;
-        const cy = midY + ny * offset;
         const cpDist = dist * 0.3;
         const cp1x = source.x + (dx / dist) * cpDist + nx * offset * 0.5;
         const cp1y = source.y + (dy / dist) * cpDist + ny * offset * 0.5;
@@ -736,12 +734,12 @@ export default function GraphPage() {
                                 if (kbId) {
                                   try {
                                     const res = await getEntityDetail(item.name, kbId);
-                                    if (res.data.data) {
+                                    if (res.data) {
                                       setSelectedEntity({
                                         id: item.id, name: item.name, entityType: item.entityType,
                                         description: '', sourceDocumentId: '', relationCount: 0,
                                       });
-                                      setEntityDetail(res.data.data);
+                                      setEntityDetail(res.data);
                                       setDetailVisible(true);
                                     }
                                   } catch { message.error('获取实体详情失败'); }

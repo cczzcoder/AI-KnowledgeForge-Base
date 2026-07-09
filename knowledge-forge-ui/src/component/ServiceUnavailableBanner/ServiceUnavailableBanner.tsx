@@ -102,10 +102,7 @@ function ServiceUnavailableBanner({ onRetry }: ServiceUnavailableBannerProps) {
 
             <div className="contact-support">
               <CustomerServiceOutlined style={{ marginRight: 4 }} />
-              <Text type="secondary">
-                联系支持：
-                <Text code style={{ marginLeft: 4 }}>admin@knowledgeforge.com</Text>
-              </Text>
+              <Text type="secondary">如需帮助，请联系系统管理员或维护人员。</Text>
             </div>
           </div>
         }
