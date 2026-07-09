@@ -51,13 +51,16 @@ export interface LearningPath {
 }
 
 export async function getKnowledgeGaps(kbId: string): Promise<ApiResponse<KnowledgeGap[]>> {
-  return request.get('/discovery/gaps', { params: { kbId } });
+  const response = await request.get<ApiResponse<KnowledgeGap[]>>('/discovery/gaps', { params: { kbId } });
+  return response.data;
 }
 
 export async function getRecommendations(kbId: string): Promise<ApiResponse<Recommendation[]>> {
-  return request.get('/discovery/recommendations', { params: { kbId } });
+  const response = await request.get<ApiResponse<Recommendation[]>>('/discovery/recommendations', { params: { kbId } });
+  return response.data;
 }
 
 export async function getLearningPath(kbId: string, topic: string): Promise<ApiResponse<LearningPath>> {
-  return request.get('/discovery/learning-path', { params: { kbId, topic } });
+  const response = await request.get<ApiResponse<LearningPath>>('/discovery/learning-path', { params: { kbId, topic } });
+  return response.data;
 }

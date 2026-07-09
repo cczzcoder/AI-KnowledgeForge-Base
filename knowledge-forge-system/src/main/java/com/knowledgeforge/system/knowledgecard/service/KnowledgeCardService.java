@@ -124,6 +124,9 @@ public class KnowledgeCardService {
 
         // 2. 内存中校验归属 + 更新状态
         String action = request.getAction();
+        if (!"APPROVED".equals(action) && !"REJECTED".equals(action)) {
+            throw new IllegalArgumentException("审核操作无效: " + action + "，有效值为 APPROVED 或 REJECTED");
+        }
         List<KnowledgeCard> approvedCards = new ArrayList<>();
         int count = 0;
 

@@ -12,6 +12,7 @@ import {
   Typography,
   Spin,
   Empty,
+  Pagination,
 } from 'antd';
 import {
   CheckOutlined,
@@ -74,6 +75,7 @@ export default function KnowledgeCardPage() {
   const [reviewEntityType, setReviewEntityType] = useState('');
 
   const [batchModalOpen, setBatchModalOpen] = useState(false);
+  const canBatchReview = statusFilter === 'PENDING';
 
   const reportBackgroundError = useCallback((context: string, error: unknown) => {
     console.warn(`[KnowledgeCardPage] ${context}`, error);
@@ -137,6 +139,10 @@ export default function KnowledgeCardPage() {
     loadPendingCount();
   }, [loadCards, loadPendingCount]);
 
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [statusFilter, page, kbId]);
+
   const handleKbChange = (val: string) => {
     setSelectedKbId(val);
     setPage(0);
@@ -144,8 +150,9 @@ export default function KnowledgeCardPage() {
     navigate(`/knowledge-cards/${val}`, { replace: true });
   };
 
-  const allSelected = cards.length > 0 && selectedIds.length === cards.length;
+  const allSelected = canBatchReview && cards.length > 0 && selectedIds.length === cards.length;
   const toggleSelectAll = () => {
+    if (!canBatchReview) return;
     if (allSelected) {
       setSelectedIds([]);
     } else {
@@ -154,6 +161,7 @@ export default function KnowledgeCardPage() {
   };
 
   const toggleSelect = (id: string) => {
+    if (!canBatchReview) return;
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
@@ -190,6 +198,10 @@ export default function KnowledgeCardPage() {
   };
 
   const submitBatchReview = async (action: 'APPROVED' | 'REJECTED') => {
+    if (!canBatchReview) {
+      message.warning('仅待审核卡片支持批量审核');
+      return;
+    }
     if (selectedIds.length === 0) {
       message.warning('请先选择卡片');
       return;
@@ -302,7 +314,7 @@ export default function KnowledgeCardPage() {
               { value: '', label: '全部' },
             ]}
           />
-          {selectedIds.length > 0 && (
+          {canBatchReview && selectedIds.length > 0 && (
             <Button onClick={() => setBatchModalOpen(true)}>批量审核 ({selectedIds.length})</Button>
           )}
         </Space>
@@ -311,9 +323,11 @@ export default function KnowledgeCardPage() {
       <Spin spinning={loading}>
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
           <Space>
-            <Checkbox checked={allSelected} onChange={toggleSelectAll}>
-              全选当前页
-            </Checkbox>
+            {canBatchReview && (
+              <Checkbox checked={allSelected} onChange={toggleSelectAll}>
+                全选当前页
+              </Checkbox>
+            )}
             <Text type="secondary">共 {total} 张卡片</Text>
           </Space>
 
@@ -327,7 +341,9 @@ export default function KnowledgeCardPage() {
                 style={{ width: '100%' }}
                 title={
                   <Space wrap>
-                    <Checkbox checked={selectedIds.includes(card.id)} onChange={() => toggleSelect(card.id)} />
+                    {canBatchReview && (
+                      <Checkbox checked={selectedIds.includes(card.id)} onChange={() => toggleSelect(card.id)} />
+                    )}
                     <Tag color={STATUS_MAP[card.status]?.color}>{STATUS_MAP[card.status]?.label || card.status}</Tag>
                     <Tag color={CATEGORY_MAP[card.category]?.color}>{CATEGORY_MAP[card.category]?.label || card.category}</Tag>
                     <Text strong>{card.title}</Text>
@@ -366,6 +382,18 @@ export default function KnowledgeCardPage() {
                 </Space>
               </Card>
             ))
+          )}
+
+          {total > pageSize && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Pagination
+                current={page + 1}
+                pageSize={pageSize}
+                total={total}
+                showSizeChanger={false}
+                onChange={(nextPage) => setPage(nextPage - 1)}
+              />
+            </div>
           )}
         </Space>
       </Spin>
