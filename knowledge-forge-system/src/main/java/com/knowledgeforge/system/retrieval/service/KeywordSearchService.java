@@ -2,6 +2,7 @@ package com.knowledgeforge.system.retrieval.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.knowledgeforge.system.config.KeywordRetrievalProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -19,6 +20,7 @@ import java.util.UUID;
 public class KeywordSearchService {
 
     private final JdbcTemplate jdbcTemplate;
+    private final KeywordRetrievalProperties keywordRetrievalProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public List<Document> search(String query, UUID kbId, int topK) {
@@ -83,7 +85,7 @@ public class KeywordSearchService {
                 String metadataText = (String) row.get("metadata_text");
                 Map<String, Object> metadata = parseMetadataJson(metadataText);
                 Document doc = new Document(content, (Map) metadata);
-                doc.getMetadata().put("keyword_score", 0.1);
+                doc.getMetadata().put("keyword_score", keywordRetrievalProperties.getFallbackScore());
                 results.add(doc);
             }
             return results;

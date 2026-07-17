@@ -7,19 +7,25 @@
 spring:
   ai:
     openai:
-      api-key: ${AI_API_KEY}                       # 必填：您的 API Key
-      base-url: ${AI_BASE_URL:https://api.siliconflow.cn}   # API 地址（默认硅基流动）
+      api-key: ${AI_API_KEY}                                  # Chat API Key（DeepSeek 官方）
+      base-url: ${AI_BASE_URL:https://api.deepseek.com}      # Chat API 地址
       chat:
         options:
-          model: ${AI_CHAT_MODEL:deepseek-ai/DeepSeek-V3.2}   # 对话模型
+          model: ${AI_CHAT_MODEL:deepseek-chat}              # 对话模型
           temperature: 0.7
-      embedding:
-        options:
-          model: ${AI_EMBEDDING_MODEL:BAAI/bge-large-zh-v1.5}  # 向量化模型
     vectorstore:
       pgvector:
         initialize-schema: false
         index-type: hnsw
         distance-type: cosine_distance
-        dimensions: 1024
+        dimensions: ${AI_EMBEDDING_DIMENSIONS:1024}          # 必须与 embedding 输出维度一致
         vector-table-name: vector_store
+
+knowledgeforge:
+  ai:
+    embedding:
+      provider: ${AI_EMBEDDING_PROVIDER:openai-compatible}   # 当前支持 openai-compatible / openai
+      base-url: ${AI_EMBEDDING_BASE_URL:https://api.siliconflow.cn}   # Embedding API 地址
+      api-key: ${AI_EMBEDDING_API_KEY:${AI_API_KEY}}         # Embedding Key，可与 Chat 独立
+      model: ${AI_EMBEDDING_MODEL:BAAI/bge-large-zh-v1.5}    # 向量模型
+      dimensions: ${AI_EMBEDDING_DIMENSIONS:1024}            # 需与 pgvector dimensions 保持一致

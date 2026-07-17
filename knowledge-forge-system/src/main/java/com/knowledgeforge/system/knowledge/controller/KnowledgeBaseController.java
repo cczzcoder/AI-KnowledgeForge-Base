@@ -5,11 +5,15 @@ import com.knowledgeforge.core.shared.constant.SystemConstants;
 import com.knowledgeforge.core.shared.dto.ApiResponse;
 import com.knowledgeforge.core.shared.dto.PageResult;
 import com.knowledgeforge.system.knowledge.dto.KnowledgeBaseDTO;
+import com.knowledgeforge.system.knowledge.dto.KnowledgeBaseResetRequest;
+import com.knowledgeforge.system.knowledge.service.KnowledgeBaseResetService;
 import com.knowledgeforge.system.knowledge.service.KnowledgeBaseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,6 +31,7 @@ import java.util.UUID;
 public class KnowledgeBaseController {
 
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseResetService knowledgeBaseResetService;
 
     @PostMapping
     public ApiResponse<KnowledgeBase> create(@Valid @RequestBody KnowledgeBaseDTO dto) {
@@ -60,5 +65,16 @@ public class KnowledgeBaseController {
     public ApiResponse<Void> delete(@PathVariable UUID id) {
         knowledgeBaseService.delete(id);
         return ApiResponse.success(null);
+    }
+
+    @DeleteMapping("/reset")
+    public ApiResponse<KnowledgeBaseResetService.ResetCleanupStats> hardResetAll() {
+        return ApiResponse.success(knowledgeBaseResetService.hardDeleteAllKnowledgeBases());
+    }
+
+    @PostMapping(value = "/reset-and-reseed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<KnowledgeBaseResetService.ResetSeedResponse> resetAndReseed(
+            @Valid @ModelAttribute KnowledgeBaseResetRequest request) {
+        return ApiResponse.success(knowledgeBaseResetService.resetAndReseed(request));
     }
 }

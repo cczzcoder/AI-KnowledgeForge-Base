@@ -34,7 +34,7 @@ public class ChunkingStrategyFactory {
         return sentenceStrategy;
     }
 
-    public List<String> chunk(String content, String fileType) {
+    public List<ChunkDescriptor> chunk(String content, String fileType) {
         return getStrategy(fileType).chunk(content);
     }
 }

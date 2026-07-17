@@ -46,6 +46,24 @@ public class DocumentChunk {
     @Column(name = "token_count")
     private Integer tokenCount;
 
+    @Column(name = "chunk_type", length = 50)
+    private String chunkType;
+
+    @Column(name = "section_title", length = 255)
+    private String sectionTitle;
+
+    @Column(name = "section_path", length = 1000)
+    private String sectionPath;
+
+    @Column(name = "start_offset")
+    private Integer startOffset;
+
+    @Column(name = "end_offset")
+    private Integer endOffset;
+
+    @Column(name = "strategy_version", length = 50)
+    private String strategyVersion;
+
     @Builder.Default
     @Column(name = "embedding_ready")
     private Boolean embeddingReady = false;

@@ -9,6 +9,7 @@ import com.knowledgeforge.system.chat.service.ChatService;
 import com.knowledgeforge.system.conversation.repository.ChatMessageRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,11 +50,28 @@ public class ChatController {
 
     @PatchMapping("/messages/{id}/feedback")
     public ApiResponse<Void> submitFeedback(@PathVariable UUID id, @RequestBody Map<String, String> body) {
-        String feedback = body.get("feedback");
+        String feedback = normalizeFeedback(body.get("feedback"));
         ChatMessage message = chatMessageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("消息不存在: " + id));
         message.setFeedback(feedback);
         chatMessageRepository.save(message);
         return ApiResponse.success(null);
+    }
+
+    private String normalizeFeedback(String feedback) {
+        if (feedback == null) {
+            return null;
+        }
+        String normalized = feedback.trim();
+        if (normalized.isEmpty()) {
+            return null;
+        }
+        return switch (normalized.toLowerCase(Locale.ROOT)) {
+            case "positive", "like", "thumbs_up" -> "POSITIVE";
+            case "negative", "dislike", "thumbs_down" -> "NEGATIVE";
+            default -> throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "不支持的反馈值: " + feedback);
+        };
     }
 }

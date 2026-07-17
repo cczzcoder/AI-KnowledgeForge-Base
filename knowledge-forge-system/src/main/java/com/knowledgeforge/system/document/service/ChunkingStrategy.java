@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ChunkingStrategy {
 
-    List<String> chunk(String content);
+    List<ChunkDescriptor> chunk(String content);
 
     boolean supports(String fileType);
 }

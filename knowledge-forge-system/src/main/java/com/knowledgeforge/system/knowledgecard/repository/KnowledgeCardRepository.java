@@ -4,6 +4,7 @@ import com.knowledgeforge.core.entity.KnowledgeCard;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,9 @@ public interface KnowledgeCardRepository extends JpaRepository<KnowledgeCard, UU
     /** 按会话查询提取的卡片 */
     List<KnowledgeCard> findByConversationId(UUID conversationId);
 
+    /** 按知识库查询所有卡片 */
+    List<KnowledgeCard> findAllByKbId(UUID kbId);
+
     /** 统计知识库中待审核卡片数量 */
     @Query("SELECT COUNT(kc) FROM KnowledgeCard kc WHERE kc.kbId = :kbId AND kc.status = 'PENDING'")
     long countPendingByKbId(@Param("kbId") UUID kbId);
@@ -34,4 +38,8 @@ public interface KnowledgeCardRepository extends JpaRepository<KnowledgeCard, UU
     /** 按知识库和分类查询已通过的卡片 */
     @Query("SELECT kc FROM KnowledgeCard kc WHERE kc.kbId = :kbId AND kc.status = 'APPROVED' AND kc.category = :category")
     List<KnowledgeCard> findApprovedByCategory(@Param("kbId") UUID kbId, @Param("category") String category);
+
+    @Modifying
+    @Query("DELETE FROM KnowledgeCard kc WHERE kc.kbId = :kbId")
+    void deleteByKbId(@Param("kbId") UUID kbId);
 }

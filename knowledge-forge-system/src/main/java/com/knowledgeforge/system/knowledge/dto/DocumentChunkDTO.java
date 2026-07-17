@@ -18,5 +18,11 @@ public class DocumentChunkDTO {
     private String content;
     private Integer chunkIndex;
     private Integer tokenCount;
+    private String chunkType;
+    private String sectionTitle;
+    private String sectionPath;
+    private Integer startOffset;
+    private Integer endOffset;
+    private String strategyVersion;
     private Boolean embeddingReady;
 }

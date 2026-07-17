@@ -22,6 +22,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, UUID> 
     @Query("DELETE FROM ChatMessage m WHERE m.conversationId = :conversationId")
     void deleteByConversationId(@Param("conversationId") UUID conversationId);
 
+    @Modifying
+    @Query("DELETE FROM ChatMessage m WHERE m.conversationId IN :conversationIds")
+    void deleteByConversationIdIn(@Param("conversationIds") Collection<UUID> conversationIds);
+
     @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.feedback = :feedback")
     long countByFeedback(@Param("feedback") String feedback);
 }

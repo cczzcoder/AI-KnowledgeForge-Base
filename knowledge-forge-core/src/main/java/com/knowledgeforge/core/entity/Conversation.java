@@ -24,9 +24,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "conversation", indexes = {
         @Index(name = "idx_conversation_deleted", columnList = "deleted"),
-        @Index(name = "idx_conversation_kb_id", columnList = "kb_id")
+        @Index(name = "idx_conversation_kb_id", columnList = "kb_id"),
+        @Index(name = "idx_conversation_cleanup_status", columnList = "cleanup_status")
 })
 public class Conversation {
+
+    public enum CleanupStatus {
+        ACTIVE,
+        EXPIRING,
+        EXPIRED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,6 +49,19 @@ public class Conversation {
     @Builder.Default
     @Column(nullable = false)
     private Boolean deleted = false;
+
+    @Builder.Default
+    @Column(name = "cleanup_status", nullable = false, length = 20)
+    private String cleanupStatus = CleanupStatus.ACTIVE.name();
+
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
+
+    @Column(name = "remind_at")
+    private LocalDateTime remindAt;
+
+    @Column(name = "reminded_at")
+    private LocalDateTime remindedAt;
 
     @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -16,6 +16,12 @@ public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, UU
 
     List<DocumentChunk> findByDocumentIdOrderByChunkIndexAsc(UUID documentId);
 
+    List<DocumentChunk> findByDocumentIdAndChunkIndexBetweenOrderByChunkIndexAsc(UUID documentId,
+                                                                                 Integer startChunkIndex,
+                                                                                 Integer endChunkIndex);
+
+    List<DocumentChunk> findByParentChunkIdIn(List<UUID> parentChunkIds);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM DocumentChunk c WHERE c.documentId = :documentId")

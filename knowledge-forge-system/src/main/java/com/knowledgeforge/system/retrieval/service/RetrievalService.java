@@ -3,6 +3,7 @@ package com.knowledgeforge.system.retrieval.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.knowledgeforge.core.shared.constant.SystemConstants;
+import com.knowledgeforge.system.config.VectorRetrievalProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -26,6 +27,7 @@ public class RetrievalService {
     private final PgVectorStore vectorStore;
     private final EmbeddingModel embeddingModel;
     private final JdbcTemplate jdbcTemplate;
+    private final VectorRetrievalProperties vectorRetrievalProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public List<Document> retrieve(String query, UUID kbId) {
@@ -55,24 +57,45 @@ public class RetrievalService {
             String sql = "SELECT vs.content, vs.metadata::text as metadata_text, 1 - (vs.embedding <=> ?::vector) AS similarity "
                     + "FROM vector_store vs "
                     + "WHERE vs.metadata->>'kb_id' = ? "
-                    + "AND 1 - (vs.embedding <=> ?::vector) >= 0.3 "
+                    + "AND 1 - (vs.embedding <=> ?::vector) >= ? "
                     + "ORDER BY vs.embedding <=> ?::vector "
                     + "LIMIT ?";
 
-            log.info("执行JDBC查询, kbId: {}, maxResults: {}", safeKbId, SystemConstants.RETRIEVAL_MAX_RESULTS);
+            log.info("执行JDBC查询, kbId: {}, maxResults: {}, similarityThreshold: {}",
+                    safeKbId,
+                    SystemConstants.RETRIEVAL_MAX_RESULTS,
+                    vectorRetrievalProperties.getSimilarityThreshold());
 
             List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                    sql, vectorStr, safeKbId, vectorStr, vectorStr, SystemConstants.RETRIEVAL_MAX_RESULTS);
+                    sql,
+                    vectorStr,
+                    safeKbId,
+                    vectorStr,
+                    vectorRetrievalProperties.getSimilarityThreshold(),
+                    vectorStr,
+                    SystemConstants.RETRIEVAL_MAX_RESULTS);
 
             log.info("JDBC向量检索: 召回 {} 条", rows.size());
             if (!rows.isEmpty()) {
+                List<Double> topSimilarities = rows.stream()
+                        .map(row -> row.get("similarity"))
+                        .filter(Number.class::isInstance)
+                        .map(Number.class::cast)
+                        .map(Number::doubleValue)
+                        .limit(5)
+                        .toList();
                 Map<String, Object> firstRow = rows.get(0);
+                log.info("向量检索top similarities: {}", topSimilarities);
                 log.info("第一条结果: similarity={}, content前50字={}",
                         firstRow.get("similarity"),
                         firstRow.get("content") != null
                                 ? firstRow.get("content").toString().substring(0,
                                         Math.min(50, firstRow.get("content").toString().length()))
                                 : "null");
+            } else {
+                log.info("向量检索未命中任何结果, kbId={}, similarityThreshold={}",
+                        safeKbId,
+                        vectorRetrievalProperties.getSimilarityThreshold());
             }
 
             List<Document> results = new ArrayList<>();
@@ -82,15 +105,15 @@ public class RetrievalService {
                 Map<String, Object> metadata = parseMetadataJson(metadataText);
                 Document doc = new Document(content, (Map) metadata);
                 if (row.get("similarity") != null) {
-                    doc.getMetadata().put("distance", ((Number) row.get("similarity")).doubleValue());
+                    doc.getMetadata().put("vector_similarity", ((Number) row.get("similarity")).doubleValue());
                 }
                 results.add(doc);
             }
 
             return results.stream()
                     .sorted(Comparator.comparingDouble(
-                            (Document d) -> ((Number) d.getMetadata().getOrDefault("distance", 0.0)).doubleValue()
-                    ))
+                            (Document d) -> ((Number) d.getMetadata().getOrDefault("vector_similarity", 0.0)).doubleValue()
+                    ).reversed())
                     .limit(SystemConstants.RETRIEVAL_TOP_K)
                     .toList();
         } catch (Exception e) {
@@ -115,8 +138,8 @@ public class RetrievalService {
         return kbIds.stream()
                 .flatMap(kbId -> retrieve(query, kbId).stream())
                 .sorted(Comparator.comparingDouble(
-                        (Document d) -> ((Number) d.getMetadata().getOrDefault("distance", 0.0)).doubleValue()
-                ))
+                        (Document d) -> ((Number) d.getMetadata().getOrDefault("vector_similarity", 0.0)).doubleValue()
+                ).reversed())
                 .limit(SystemConstants.RETRIEVAL_TOP_K)
                 .toList();
     }

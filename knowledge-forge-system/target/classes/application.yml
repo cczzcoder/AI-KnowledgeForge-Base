@@ -67,3 +67,48 @@ knowledgeforge:
   extraction:
     max-chunks: 10
     rate-limit-ms: 500
+  conversation:
+    retention-days: 30
+    remind-days-before: 7
+    cleanup-cron: "0 0 3 * * *"
+  chat:
+    context:
+      max-chars: 12000
+      max-chunks: 8
+      max-chunks-per-document: 3
+      source-snippet-max-chars: 150
+      high-confidence:
+        min-evidence-hits: 2
+        vector-similarity-threshold: 0.9
+        vector-hybrid-score-threshold: 0.011
+        keyword-score-threshold: 0.28
+        keyword-hybrid-score-threshold: 0.0115
+        graph-score-threshold: 0.9
+        graph-hybrid-score-threshold: 0.0105
+    credibility:
+      similarity-weight: 0.4
+      freshness-weight: 0.2
+      diversity-weight: 0.2
+      history-weight: 0.2
+      freshness-decay-days: 90
+    extraction:
+      auto-extract-max-cards: 3
+  retrieval:
+    vector:
+      similarity-threshold: 0.3
+    keyword:
+      fallback-score: 0.1
+    hybrid:
+      rrf:
+        k: 60.0
+      weights:
+        vector: 0.7
+        keyword: 0.3
+        graph: 0.15
+      thresholds:
+        min-hybrid-score: 0.0114
+        min-evidence-hits: 2
+      adjacent:
+        chunk-window: 1
+        max-adjacent-chunks: 3
+        max-adjacent-chunks-per-anchor: 1

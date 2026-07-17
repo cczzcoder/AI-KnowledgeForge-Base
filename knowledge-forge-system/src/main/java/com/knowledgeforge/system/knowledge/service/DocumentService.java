@@ -6,6 +6,7 @@ import com.knowledgeforge.core.shared.constant.SystemConstants;
 import com.knowledgeforge.core.shared.exception.DocumentProcessException;
 import com.knowledgeforge.core.shared.dto.PageResult;
 import com.knowledgeforge.system.document.dto.ParsedDocument;
+import com.knowledgeforge.system.document.service.ChunkDescriptor;
 import com.knowledgeforge.system.document.service.ChunkingStrategyFactory;
 import com.knowledgeforge.system.document.service.DocumentParserFactory;
 import com.knowledgeforge.system.graph.service.GraphService;
@@ -149,19 +150,34 @@ public class DocumentService {
             doc.setTitle(parsed.getTitle());
         }
 
-        List<String> chunks = chunkingFactory.chunk(parsed.getContent(), doc.getFileType());
+        List<ChunkDescriptor> chunks = chunkingFactory.chunk(parsed.getContent(), doc.getFileType());
         log.info("文档 [{}] 自适应分块完成，共 {} 个块", fileName, chunks.size());
 
         List<DocumentChunk> chunkEntities = new ArrayList<>();
-        for (int i = 0; i < chunks.size(); i++) {
+        List<Integer> parentRefs = new ArrayList<>();
+        for (ChunkDescriptor descriptor : chunks) {
             DocumentChunk chunk = DocumentChunk.builder()
                     .documentId(doc.getId())
-                    .content(chunks.get(i))
-                    .chunkIndex(i)
-                    .tokenCount(estimateTokens(chunks.get(i)))
+                    .content(descriptor.getContent())
+                    .chunkIndex(descriptor.getChunkIndex())
+                    .tokenCount(descriptor.getTokenCount() != null ? descriptor.getTokenCount() : estimateTokens(descriptor.getContent()))
+                    .chunkType(descriptor.getChunkType())
+                    .sectionTitle(descriptor.getSectionTitle())
+                    .sectionPath(descriptor.getSectionPath())
+                    .startOffset(descriptor.getStartOffset())
+                    .endOffset(descriptor.getEndOffset())
+                    .strategyVersion(descriptor.getStrategyVersion())
                     .embeddingReady(false)
                     .build();
             chunkEntities.add(chunk);
+            parentRefs.add(descriptor.getParentRef());
+        }
+        chunkEntities = chunkRepository.saveAll(chunkEntities);
+        for (int i = 0; i < chunkEntities.size(); i++) {
+            Integer parentRef = parentRefs.get(i);
+            if (parentRef != null && parentRef >= 0 && parentRef < chunkEntities.size()) {
+                chunkEntities.get(i).setParentChunkId(chunkEntities.get(parentRef).getId());
+            }
         }
         chunkEntities = chunkRepository.saveAll(chunkEntities);
         doc.setChunkCount(chunkEntities.size());
@@ -178,6 +194,24 @@ public class DocumentService {
                 if (chunk.getParentChunkId() != null) {
                     springDoc.getMetadata().put("parent_chunk_id", chunk.getParentChunkId().toString());
                 }
+                if (chunk.getSectionTitle() != null) {
+                    springDoc.getMetadata().put("section_title", chunk.getSectionTitle());
+                }
+                if (chunk.getSectionPath() != null) {
+                    springDoc.getMetadata().put("section_path", chunk.getSectionPath());
+                }
+                if (chunk.getChunkType() != null) {
+                    springDoc.getMetadata().put("chunk_type", chunk.getChunkType());
+                }
+                if (chunk.getStrategyVersion() != null) {
+                    springDoc.getMetadata().put("strategy_version", chunk.getStrategyVersion());
+                }
+                if (chunk.getStartOffset() != null) {
+                    springDoc.getMetadata().put("start_offset", chunk.getStartOffset());
+                }
+                if (chunk.getEndOffset() != null) {
+                    springDoc.getMetadata().put("end_offset", chunk.getEndOffset());
+                }
                 springDocs.add(springDoc);
             }
             vectorStore.add(springDocs);
@@ -189,7 +223,10 @@ public class DocumentService {
             log.info("文档 [{}] 向量化完成，已写入 {} 条向量", fileName, chunkEntities.size());
 
             try {
-                graphService.buildGraphFromChunks(doc.getKbId(), doc.getId(), chunks);
+                graphService.buildGraphFromChunks(doc.getKbId(), doc.getId(),
+                        chunks.stream()
+                                .map(descriptor -> descriptor.getContent() == null ? "" : descriptor.getContent())
+                                .toList());
                 log.info("文档 [{}] 知识图谱构建完成", fileName);
             } catch (Exception e) {
                 log.warn("文档 [{}] 知识图谱构建失败（不影响正常流程）: {}", fileName, e.getMessage());
@@ -365,6 +402,12 @@ public class DocumentService {
                         : chunk.getContent())
                 .chunkIndex(chunk.getChunkIndex())
                 .tokenCount(chunk.getTokenCount())
+                .chunkType(chunk.getChunkType())
+                .sectionTitle(chunk.getSectionTitle())
+                .sectionPath(chunk.getSectionPath())
+                .startOffset(chunk.getStartOffset())
+                .endOffset(chunk.getEndOffset())
+                .strategyVersion(chunk.getStrategyVersion())
                 .embeddingReady(chunk.getEmbeddingReady())
                 .build();
     }

@@ -2,6 +2,7 @@ package com.knowledgeforge.system.chat.service;
 
 import com.knowledgeforge.core.entity.Document;
 import com.knowledgeforge.system.chat.dto.CredibilityBreakdownDTO;
+import com.knowledgeforge.system.config.CredibilityProperties;
 import com.knowledgeforge.system.conversation.repository.ChatMessageRepository;
 import com.knowledgeforge.system.knowledge.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CredibilityService {
 
-    private static final double SIMILARITY_WEIGHT = 0.4;
-    private static final double FRESHNESS_WEIGHT = 0.2;
-    private static final double DIVERSITY_WEIGHT = 0.2;
-    private static final double HISTORY_WEIGHT = 0.2;
-    private static final int FRESHNESS_DECAY_DAYS = 90;
-
+    private final CredibilityProperties credibilityProperties;
     private final DocumentRepository documentRepository;
     private final ChatMessageRepository chatMessageRepository;
 
@@ -49,10 +45,10 @@ public class CredibilityService {
         double diversityScore = calculateSourceDiversity(retrievedDocs);
         double historyScore = calculateHistoricalAccuracy();
 
-        double overallScore = similarityScore * SIMILARITY_WEIGHT
-                + freshnessScore * FRESHNESS_WEIGHT
-                + diversityScore * DIVERSITY_WEIGHT
-                + historyScore * HISTORY_WEIGHT;
+        double overallScore = similarityScore * credibilityProperties.getSimilarityWeight()
+                + freshnessScore * credibilityProperties.getFreshnessWeight()
+                + diversityScore * credibilityProperties.getDiversityWeight()
+                + historyScore * credibilityProperties.getHistoryWeight();
 
         return CredibilityBreakdownDTO.builder()
                 .similarityScore(round(similarityScore))
@@ -108,7 +104,7 @@ public class CredibilityService {
         double totalFreshness = 0;
         for (var document : documents) {
             long daysSinceCreation = ChronoUnit.DAYS.between(document.getCreatedAt(), now);
-            double decayFactor = Math.exp(-((double) daysSinceCreation / FRESHNESS_DECAY_DAYS));
+            double decayFactor = Math.exp(-((double) daysSinceCreation / credibilityProperties.getFreshnessDecayDays()));
             totalFreshness += decayFactor;
         }
 

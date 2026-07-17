@@ -21,5 +21,11 @@ public class ConversationDTO {
     private int messageCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String cleanupStatus;
+    private LocalDateTime expiresAt;
+    private LocalDateTime remindAt;
+    private boolean expiringSoon;
+    private Long daysUntilExpiry;
+    private String retentionNotice;
     private List<ChatMessageDTO> messages;
 }

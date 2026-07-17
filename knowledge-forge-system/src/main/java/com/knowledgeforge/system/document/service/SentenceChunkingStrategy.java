@@ -5,22 +5,20 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Slf4j
 @Component
 public class SentenceChunkingStrategy implements ChunkingStrategy {
 
-    private static final Pattern SENTENCE_PATTERN = Pattern.compile(
-            "[^。！？；\\n]+[。！？；\\n]?");
     private static final int MAX_CHUNK_SIZE = 512;
     private static final int OVERLAP_SIZE = 50;
+    private static final String STRATEGY_VERSION = "sentence-v1";
 
     @Override
-    public List<String> chunk(String content) {
-        List<String> chunks = new ArrayList<>();
+    public List<ChunkDescriptor> chunk(String content) {
+        List<ChunkDescriptor> chunks = new ArrayList<>();
         if (content.length() <= MAX_CHUNK_SIZE) {
-            chunks.add(content);
+            chunks.add(buildChunk(0, content, 0, content.length()));
             return chunks;
         }
 
@@ -33,7 +31,8 @@ public class SentenceChunkingStrategy implements ChunkingStrategy {
                     end = cutPoint;
                 }
             }
-            chunks.add(content.substring(start, end).trim());
+            String chunkContent = content.substring(start, end).trim();
+            chunks.add(buildChunk(chunks.size(), chunkContent, start, end));
             start = Math.max(start + (end - start - OVERLAP_SIZE), start + 1);
         }
         return chunks;
@@ -48,6 +47,22 @@ public class SentenceChunkingStrategy implements ChunkingStrategy {
             }
         }
         return target;
+    }
+
+    private ChunkDescriptor buildChunk(int index, String content, int startOffset, int endOffset) {
+        return ChunkDescriptor.builder()
+                .chunkIndex(index)
+                .content(content)
+                .tokenCount(estimateTokens(content))
+                .chunkType("sentence")
+                .startOffset(Math.max(startOffset, 0))
+                .endOffset(Math.max(endOffset, Math.max(startOffset, 0)))
+                .strategyVersion(STRATEGY_VERSION)
+                .build();
+    }
+
+    private int estimateTokens(String text) {
+        return (int) Math.ceil(text.length() / 1.5d);
     }
 
     @Override

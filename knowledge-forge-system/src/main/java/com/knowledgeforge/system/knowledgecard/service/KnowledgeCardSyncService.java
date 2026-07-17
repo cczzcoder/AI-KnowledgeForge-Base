@@ -31,8 +31,6 @@ public class KnowledgeCardSyncService {
     private final KnowledgeGraphEntityRepository entityRepository;
     private final PgVectorStore vectorStore;
 
-    private static final String CHUNK_ID_PREFIX = "card:";
-
     /**
      * 审核通过后同步写入向量库和图谱。
      * 该方法在 KnowledgeCardService.reviewCard 内部调用，共享事务。
@@ -71,7 +69,7 @@ public class KnowledgeCardSyncService {
      */
     private void syncToVectorStore(KnowledgeCard card) {
         Document springDoc = new Document(card.getTitle() + "\n" + card.getContent());
-        springDoc.getMetadata().put("chunk_id", CHUNK_ID_PREFIX + card.getId().toString());
+        springDoc.getMetadata().put("chunk_id", card.getId().toString());
         springDoc.getMetadata().put("document_id", card.getId().toString());
         springDoc.getMetadata().put("kb_id", card.getKbId().toString());
         springDoc.getMetadata().put("chunk_index", 0);
